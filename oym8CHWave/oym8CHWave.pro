@@ -72,6 +72,12 @@ CONFIG(debug, debug|release) {
     message("release")
 }
 
+DISTFILES +=
+
+RESOURCES += \
+    image.qrc \
+    qdarkstyle/style.qrc
+
 
 
 

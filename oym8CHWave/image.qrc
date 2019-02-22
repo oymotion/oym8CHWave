@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/prefix1"/>
+    <qresource prefix="/">
+        <file>img/oymotion.ico</file>
+    </qresource>
+</RCC>

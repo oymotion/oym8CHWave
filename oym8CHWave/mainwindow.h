@@ -8,6 +8,7 @@
 #include <mutex>
 #include <QtSerialPort/QSerialPort>
 #include "CircleBuff.h"
+#include "qcustomplot/qcustomplot.h"
 
 namespace Ui {
   class MainWindow;
@@ -52,8 +53,12 @@ private:
   std::thread queryThread;
   std::mutex commandsMutex;
 
+  static const int CHNUM = 8;
+
+  QCustomPlot *plots[CHNUM];
+
   QVector<double> x;
-  QVector<double> ch_data[8];
+  QVector<double> ch_data[CHNUM];
 
   char  sendData = 0x0;
   uint32_t count;
@@ -63,10 +68,9 @@ private:
   const int Y_RANGE = 250;
   const int SHOW_MESSAGE_TIME = 5000;
 
-  CIRCLE_BUFFER<int> chBufRaw[8];
-  CIRCLE_BUFFER<int> chBufRawLast[8];
+  CIRCLE_BUFFER<int> chBufRaw[CHNUM];
+  CIRCLE_BUFFER<int> chBufRawLast[CHNUM];
 
-  void queryParams(); // Thread function
 };
 
 #endif // MAINWINDOW_H
