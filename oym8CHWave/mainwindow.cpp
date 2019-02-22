@@ -1,3 +1,33 @@
+/*
+   Copyright 2017, OYMotion Inc.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+   1. Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+   COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+   INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+   OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+   AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+   THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
+
+*/
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -19,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
   ui->setupUi(this);
 
-  QFile f(":qdarkstyle/style.qss");
+  QFile f(":qdarkstyle/style.qss");  //显示图片
 
   if (!f.exists())
   {
@@ -32,12 +62,12 @@ MainWindow::MainWindow(QWidget *parent) :
       qApp->setStyleSheet(ts.readAll());
   }
 
-  ch_WindowInit();
+  ch_WindowInit();   //波形显示界面初始化
 
-  for (int i = 0; i < CHNUM; i++)
+  for (int i = 0; i < CHNUM; i++)  //初始化数据滤波存储数组
   {
-    chBufRaw[i].begin(32);
-    chBufRawLast[i].begin(32);
+    chBufRaw[i].begin(1024);
+    chBufRawShort[i].begin(32);
   }
 }
 
@@ -45,13 +75,15 @@ MainWindow::~MainWindow()
 {
   if (serialPort.isOpen())
   {
-    serialPort.close();
+    serialPort.close();  //退出时关闭串口
   }
+
   delete ui;
 }
 
 void MainWindow::ch_WindowInit()
 {
+  //初始化控件数组
   plots[0] = ui->customPlot_CH1;
   plots[1] = ui->customPlot_CH2;
   plots[2] = ui->customPlot_CH3;
@@ -60,6 +92,7 @@ void MainWindow::ch_WindowInit()
   plots[5] = ui->customPlot_CH6;
   plots[6] = ui->customPlot_CH7;
   plots[7] = ui->customPlot_CH8;
+
 
   for (int i = 0; i < ARR_SIZE(plots); i++)
   {
@@ -79,8 +112,6 @@ void MainWindow::ch_WindowInit()
     plots[i]->yAxis->setTickPen(QPen(Qt::gray));
     plots[i]->yAxis->setSubTickPen(QPen(Qt::gray));
     plots[i]->yAxis->setTickLabelColor(Qt::gray);
-
-
 
     plots[i]->graph(0)->setPen(QPen(Qt::green));
   }
@@ -102,7 +133,8 @@ void MainWindow::on_drawLine(QVector<double> rawData)
 
       for (int n = 0; n < CHNUM; ++n)
       {
-        int raw = (rawData[i*CHNUM+n] + rawData[(i+1)*CHNUM+n]) / 2;
+        //int raw = (rawData[i*CHNUM+n] + rawData[(i+1)*CHNUM+n]) / 2;
+        int raw = rawData[i*CHNUM+n];
         ch_data[n].push_back(raw);
         dataBack = filterProces(raw, n);
         sendData = (sendData | dataBack << n);
@@ -153,9 +185,9 @@ void MainWindow::on_actionStop_triggered()
 void MainWindow::on_actionConnect_triggered()
 {
   if (serialPort.isOpen())
-    {
-      serialPort.close();
-    }
+  {
+    serialPort.close();
+  }
   else
   {
     DialogConnect dialogConnect(this);
@@ -163,16 +195,16 @@ void MainWindow::on_actionConnect_triggered()
   }
 
   if (serialPort.isOpen())
-    {
-      ui->actionConnect->setText(tr("Disconnect"));
+  {
+    ui->actionConnect->setText(tr("Disconnect"));
 
-      qDebug() <<"Connect Success";
-      sendData = 0;
-    }
+    qDebug() <<"Connect Success";
+    sendData = 0;
+  }
   else
-    {
-      ui->actionConnect->setText(tr("Connect"));
-    }
+  {
+    ui->actionConnect->setText(tr("Connect"));
+  }
 }
 
 
@@ -180,9 +212,11 @@ uint8_t MainWindow::filterProces(int channelData, int CHNum)
 {
   chBufRaw[CHNum].write(channelData);
 
-  chBufRawLast[CHNum].write(abs(channelData - chBufRaw[CHNum].readMean()));
+  chBufRawShort[CHNum].write(abs(channelData - chBufRaw[CHNum].readMean()));
 
-  if (abs(chBufRawLast[CHNum].readMean()) > 15)
+  qDebug() <<"CHNum" << CHNum << chBufRaw[CHNum].readMean() << "chBufRawShort[CHNum].readMean()" << chBufRawShort[CHNum].readMean();
+
+  if ((chBufRawShort[CHNum].readMean() > THRESHOLD_MIN) && (chBufRawShort[CHNum].readMean() < THRESHOLD_MAX))
   {
     return 0x01;
   }
@@ -191,3 +225,5 @@ uint8_t MainWindow::filterProces(int channelData, int CHNum)
     return 0x00;
   }
 }
+
+
