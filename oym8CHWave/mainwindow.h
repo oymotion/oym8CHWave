@@ -63,13 +63,14 @@ private:
   char  sendData = 0x0;
   uint32_t count;
 
-  const int THRESHOLD = 120;
+  const int THRESHOLD_MIN = 4;
+  const int THRESHOLD_MAX = 80;
   const int X_RANGE = 100;
   const int Y_RANGE = 250;
   const int SHOW_MESSAGE_TIME = 5000;
 
   CIRCLE_BUFFER<int> chBufRaw[CHNUM];
-  CIRCLE_BUFFER<int> chBufRawLast[CHNUM];
+  CIRCLE_BUFFER<int> chBufRawShort[CHNUM];
 
 };
 

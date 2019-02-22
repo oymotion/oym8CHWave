@@ -38,7 +38,7 @@ TimerThree timer3;
 
 int pinLevel = 0;
 int count[CH] = {0};
-bool musicEnable[CH];
+bool musicEnable[CH] = {false};
 int countMax[CH] =
 {
   FREQ_TO_CNT(NOTE_C4),
@@ -72,7 +72,7 @@ void loop() {
   if (Serial.available() > 0)
   {
     int n;
-
+    
     int chData = Serial.read();
     //Serial.print(ch);
 
