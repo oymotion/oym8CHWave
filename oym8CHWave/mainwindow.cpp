@@ -11,15 +11,30 @@
 
 QT_USE_NAMESPACE
 
+#define ARR_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
+
+  QFile f(":qdarkstyle/style.qss");
+
+  if (!f.exists())
+  {
+      printf("Unable to set stylesheet, file not found\n");
+  }
+  else
+  {
+      f.open(QFile::ReadOnly | QFile::Text);
+      QTextStream ts(&f);
+      qApp->setStyleSheet(ts.readAll());
+  }
+
   ch_WindowInit();
 
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < CHNUM; i++)
   {
     chBufRaw[i].begin(32);
     chBufRawLast[i].begin(32);
@@ -37,31 +52,38 @@ MainWindow::~MainWindow()
 
 void MainWindow::ch_WindowInit()
 {
-  ui->customPlot_CH1->addGraph(); // CH1
-  ui->customPlot_CH2->addGraph(); // CH2
-  ui->customPlot_CH3->addGraph(); // CH3
-  ui->customPlot_CH4->addGraph(); // CH4
-  ui->customPlot_CH5->addGraph(); // CH5
-  ui->customPlot_CH6->addGraph(); // CH6
-  ui->customPlot_CH7->addGraph(); // CH7
-  ui->customPlot_CH8->addGraph(); // CH8
+  plots[0] = ui->customPlot_CH1;
+  plots[1] = ui->customPlot_CH2;
+  plots[2] = ui->customPlot_CH3;
+  plots[3] = ui->customPlot_CH4;
+  plots[4] = ui->customPlot_CH5;
+  plots[5] = ui->customPlot_CH6;
+  plots[6] = ui->customPlot_CH7;
+  plots[7] = ui->customPlot_CH8;
 
-  ui->customPlot_CH1->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH1->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH2->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH2->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH3->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH3->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH4->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH4->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH5->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH5->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH6->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH6->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH7->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH7->yAxis->setRange(0, Y_RANGE);
-  ui->customPlot_CH8->xAxis->setRange(0, X_RANGE);
-  ui->customPlot_CH8->yAxis->setRange(0, Y_RANGE);
+  for (int i = 0; i < ARR_SIZE(plots); i++)
+  {
+    plots[i]->addGraph();
+
+    plots[i]->xAxis->setRange(0, X_RANGE);
+    plots[i]->yAxis->setRange(0, Y_RANGE);
+
+    plots[i]->setBackground(QBrush(QColor(64, 64, 64, 100)));
+
+    plots[i]->xAxis->setBasePen(QPen(Qt::gray));
+    plots[i]->xAxis->setTickPen(QPen(Qt::gray));
+    plots[i]->xAxis->setSubTickPen(QPen(Qt::gray));
+    plots[i]->xAxis->setTickLabelColor(Qt::gray);
+
+    plots[i]->yAxis->setBasePen(QPen(Qt::gray));
+    plots[i]->yAxis->setTickPen(QPen(Qt::gray));
+    plots[i]->yAxis->setSubTickPen(QPen(Qt::gray));
+    plots[i]->yAxis->setTickLabelColor(Qt::gray);
+
+
+
+    plots[i]->graph(0)->setPen(QPen(Qt::green));
+  }
 
   x.clear();
   count = 0;
@@ -73,16 +95,14 @@ void MainWindow::on_drawLine(QVector<double> rawData)
 
   if (rawData.size() == 128)
   {
-
-
     for (int i = 0; i < 16; i += 2)
     {
       x.push_back(count++);
       sendData = 0;
 
-      for (int n = 0; n < 8; ++n)
+      for (int n = 0; n < CHNUM; ++n)
       {
-        int raw = (rawData[i*8+n] + rawData[(i+1)*8+n]) / 2;
+        int raw = (rawData[i*CHNUM+n] + rawData[(i+1)*CHNUM+n]) / 2;
         ch_data[n].push_back(raw);
         dataBack = filterProces(raw, n);
         sendData = (sendData | dataBack << n);
@@ -95,62 +115,28 @@ void MainWindow::on_drawLine(QVector<double> rawData)
 
     }
 
-
-
     while (x.length() > X_RANGE)
     {
       x.pop_front();
 
-      for (int n = 0; n < 8; ++n)
+      for (int n = 0; n < CHNUM; ++n)
       {
         ch_data[n].pop_front();
       }
     }
 
-    ui->customPlot_CH1->graph(0)->setData(x, ch_data[0]);
-    ui->customPlot_CH2->graph(0)->setData(x, ch_data[1]);
-    ui->customPlot_CH3->graph(0)->setData(x, ch_data[2]);
-    ui->customPlot_CH4->graph(0)->setData(x, ch_data[3]);
-    ui->customPlot_CH5->graph(0)->setData(x, ch_data[4]);
-    ui->customPlot_CH6->graph(0)->setData(x, ch_data[5]);
-    ui->customPlot_CH7->graph(0)->setData(x, ch_data[6]);
-    ui->customPlot_CH8->graph(0)->setData(x, ch_data[7]);
+    for (int i = 0; i < ARR_SIZE(plots); i++)
+    {
+      plots[i]->graph(0)->setData(x, ch_data[i]);
 
-    auto range_1 = ui->customPlot_CH1->yAxis->range();
-    auto range_2 = ui->customPlot_CH2->yAxis->range();
-    auto range_3 = ui->customPlot_CH3->yAxis->range();
-    auto range_4 = ui->customPlot_CH4->yAxis->range();
-    auto range_5 = ui->customPlot_CH5->yAxis->range();
-    auto range_6 = ui->customPlot_CH6->yAxis->range();
-    auto range_7 = ui->customPlot_CH7->yAxis->range();
-    auto range_8 = ui->customPlot_CH8->yAxis->range();
+      auto range = plots[i]->yAxis->range();
 
-    ui->customPlot_CH1->rescaleAxes();
-    ui->customPlot_CH2->rescaleAxes();
-    ui->customPlot_CH3->rescaleAxes();
-    ui->customPlot_CH4->rescaleAxes();
-    ui->customPlot_CH5->rescaleAxes();
-    ui->customPlot_CH6->rescaleAxes();
-    ui->customPlot_CH7->rescaleAxes();
-    ui->customPlot_CH8->rescaleAxes();
+      plots[i]->rescaleAxes();
 
-    ui->customPlot_CH1->yAxis->setRange(range_1);
-    ui->customPlot_CH2->yAxis->setRange(range_2);
-    ui->customPlot_CH3->yAxis->setRange(range_3);
-    ui->customPlot_CH4->yAxis->setRange(range_4);
-    ui->customPlot_CH5->yAxis->setRange(range_5);
-    ui->customPlot_CH6->yAxis->setRange(range_6);
-    ui->customPlot_CH7->yAxis->setRange(range_7);
-    ui->customPlot_CH8->yAxis->setRange(range_8);
+      plots[i]->yAxis->setRange(range);
 
-    ui->customPlot_CH1->replot();
-    ui->customPlot_CH2->replot();
-    ui->customPlot_CH3->replot();
-    ui->customPlot_CH4->replot();
-    ui->customPlot_CH5->replot();
-    ui->customPlot_CH6->replot();
-    ui->customPlot_CH7->replot();
-    ui->customPlot_CH8->replot();
+      plots[i]->replot();
+    }
   }
 }
 
@@ -168,7 +154,6 @@ void MainWindow::on_actionConnect_triggered()
 {
   if (serialPort.isOpen())
     {
-      //disconnect(&serialPort, SIGNAL(readyRead()), this, SLOT(handleReadyRead()));
       serialPort.close();
     }
   else
@@ -181,10 +166,7 @@ void MainWindow::on_actionConnect_triggered()
     {
       ui->actionConnect->setText(tr("Disconnect"));
 
-      //connect(&serialPort, SIGNAL(readyRead()), this, SLOT(handleReadyRead()));
-      //serialPort.write("Connect Success\n");
       qDebug() <<"Connect Success";
-
       sendData = 0;
     }
   else
@@ -196,13 +178,9 @@ void MainWindow::on_actionConnect_triggered()
 
 uint8_t MainWindow::filterProces(int channelData, int CHNum)
 {
-//  auto *chData = channelData.data();
+  chBufRaw[CHNum].write(channelData);
 
-
-    chBufRaw[CHNum].write(channelData);
-
-    chBufRawLast[CHNum].write(abs(channelData - chBufRaw[CHNum].readMean()));
-
+  chBufRawLast[CHNum].write(abs(channelData - chBufRaw[CHNum].readMean()));
 
   if (abs(chBufRawLast[CHNum].readMean()) > 15)
   {
