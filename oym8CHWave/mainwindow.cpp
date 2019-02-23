@@ -45,7 +45,8 @@ QT_USE_NAMESPACE
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
-  ui(new Ui::MainWindow)
+  ui(new Ui::MainWindow),
+  deviceConnected(false)
 {
   ui->setupUi(this);
 
@@ -122,29 +123,27 @@ void MainWindow::ch_WindowInit()
 
 void MainWindow::on_drawLine(QVector<double> rawData)
 {
-  uint8_t dataBack;
-
   if (rawData.size() == 128)
   {
     for (int i = 0; i < 16; i += 2)
     {
       x.push_back(count++);
-      sendData = 0;
+      uint8_t sendData = 0;
 
       for (int n = 0; n < CHNUM; ++n)
       {
         //int raw = (rawData[i*CHNUM+n] + rawData[(i+1)*CHNUM+n]) / 2;
-        int raw = rawData[i*CHNUM+n];
+        int raw = rawData[i * CHNUM + n];
         ch_data[n].push_back(raw);
-        dataBack = filterProces(raw, n);
+
+        uint8_t dataBack = filterProces(raw, n);
         sendData = (sendData | dataBack << n);
       }  
 
       if (serialPort.isOpen())
       {
-        serialPort.write(&sendData, 1);
+        serialPort.write((char*)&sendData, 1);
       }
-
     }
 
     while (x.length() > X_RANGE)
@@ -170,6 +169,21 @@ void MainWindow::on_drawLine(QVector<double> rawData)
       plots[i]->replot();
     }
   }
+}
+
+void MainWindow::handleDeviceDisconnected()
+{
+  if (deviceConnected)
+  {
+    deviceConnected = false;
+    QMessageBox::information(this, tr("Info"), tr("gForce disconnected."));
+  }
+}
+
+void MainWindow::handleDeviceConnected()
+{
+  deviceConnected = true;
+  ui->statusBar->showMessage(tr("gForce connected."), SHOW_MESSAGE_TIME);
 }
 
 void MainWindow::handleReadyRead()
@@ -199,7 +213,6 @@ void MainWindow::on_actionConnect_triggered()
     ui->actionConnect->setText(tr("Disconnect"));
 
     qDebug() <<"Connect Success";
-    sendData = 0;
   }
   else
   {
@@ -214,7 +227,7 @@ uint8_t MainWindow::filterProces(int channelData, int CHNum)
 
   chBufRawShort[CHNum].write(abs(channelData - chBufRaw[CHNum].readMean()));
 
-  qDebug() <<"CHNum" << CHNum << chBufRaw[CHNum].readMean() << "chBufRawShort[CHNum].readMean()" << chBufRawShort[CHNum].readMean();
+//  qDebug() <<"CHNum" << CHNum << chBufRaw[CHNum].readMean() << "chBufRawShort[CHNum].readMean()" << chBufRawShort[CHNum].readMean();
 
   if ((chBufRawShort[CHNum].readMean() > THRESHOLD_MIN) && (chBufRawShort[CHNum].readMean() < THRESHOLD_MAX))
   {
