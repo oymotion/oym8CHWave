@@ -30,10 +30,14 @@ int main(int argc, char *argv[])
   QObject::connect(gflistener.get(), SIGNAL(sendDeviceData(QVector<double>)),
                    &mainwindow, SLOT(on_drawLine(QVector<double>)));
 
+  QObject::connect(gflistener.get(), SIGNAL(deviceConnected()),
+                   &mainwindow, SLOT(handleDeviceConnected()));
+
+  QObject::connect(gflistener.get(), SIGNAL(deviceDisConnected()),
+                   &mainwindow, SLOT(handleDeviceDisconnected()));
+
   GfThread gfThread(gflistener, pHub);
   gfThread.start();
-
-
 
   fut.wait();
 

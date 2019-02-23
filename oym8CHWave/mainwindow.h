@@ -36,11 +36,15 @@ private slots:
 
   void handleReadyRead();
 
+  void handleDeviceDisconnected();
+  void handleDeviceConnected();
+
   void on_actionStop_triggered();
 
   void on_actionConnect_triggered();
 
   void on_drawLine(QVector<double> rawData);
+
 
 protected:
   friend class DialogConnect;
@@ -49,25 +53,21 @@ protected:
 private:
   Ui::MainWindow *ui;
 
-  std::map<QWidget*, QString> commands;
-  std::thread queryThread;
-  std::mutex commandsMutex;
-
   static const int CHNUM = 8;
+  const int THRESHOLD_MIN = 4;
+  const int THRESHOLD_MAX = 80;
+  const int X_RANGE = 100;
+  const int Y_RANGE = 250;
+  const int SHOW_MESSAGE_TIME = 5000;
+
+  bool deviceConnected;
 
   QCustomPlot *plots[CHNUM];
 
   QVector<double> x;
   QVector<double> ch_data[CHNUM];
 
-  char  sendData = 0x0;
   uint32_t count;
-
-  const int THRESHOLD_MIN = 4;
-  const int THRESHOLD_MAX = 80;
-  const int X_RANGE = 100;
-  const int Y_RANGE = 250;
-  const int SHOW_MESSAGE_TIME = 5000;
 
   CIRCLE_BUFFER<int> chBufRaw[CHNUM];
   CIRCLE_BUFFER<int> chBufRawShort[CHNUM];

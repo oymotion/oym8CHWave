@@ -127,7 +127,7 @@ void gfSdkQml::onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason)
 
     mDConnectStatus = false;
 
-    // send deviceConnected signal
+    // send deviceDisConnected signal
     emit deviceDisConnected();
 
     // disconnected by power button
