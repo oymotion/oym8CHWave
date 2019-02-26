@@ -53,9 +53,11 @@ int countMax[CH] =
 
 const int ledPin = 13;
 
-void pinOutControl();
+void timerCallBack();
 
-void setup() {
+
+void setup()
+{
   // put your setup code here, to run once:
   Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
@@ -68,26 +70,35 @@ void setup() {
   Timer3.attachInterrupt(timerCallBack, 1E6 / TIMER_FREQ/* freq to us*/);
 }
 
-void loop() {
+
+void loop()
+{
+  static uint32_t lastDataTime = 0;
+  
   if (Serial.available() > 0)
   {
-    int n;
-    
     int chData = Serial.read();
     //Serial.print(ch);
 
-    if (chData != -1)
+    for (int n = 0; n < CH; n++)
     {
-      for (n = 0; n < CH; n++)
-      {
-        musicEnable[n] = ((chData & (0x01 << n)) != 0);
-      }
+      musicEnable[n] = ((chData & (0x01 << n)) != 0);
+    }
 
-      pinLevel = 1 - pinLevel;
-      digitalWrite(ledPin, pinLevel);
+    pinLevel = 1 - pinLevel;
+    digitalWrite(ledPin, pinLevel);
+    
+    lastDataTime = millis();
+  }
+  else if ((uint32_t)(millis() - lastDataTime) > 20)
+  {
+    for (int n = 0; n < CH; n++)
+    {
+      musicEnable[n] = false;
     }
   }
 }
+
 
 void timerCallBack()
 {
