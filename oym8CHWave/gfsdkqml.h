@@ -47,7 +47,7 @@ public:
 
 signals:
     QVariant sendQuaternion(QVariant quaternion);
-    void sendDeviceData(QVector<double> data);
+    void sendDeviceData(QVector<uint8_t> data);
 //  void sendQuaternion(QVector<float> quaternion);
     // dongle unplugged
     void dongleUnplugged();

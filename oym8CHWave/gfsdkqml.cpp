@@ -262,7 +262,7 @@ void gfSdkQml::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, gf
 
         // qvector, must be RawData;
         if (128 == data->size()) {
-            QVector<double> tempRawData;
+            QVector<uint8_t> tempRawData;
             for (int i = 0; i < data->size(); ++i) {
                 tempRawData.push_back((*data)[i]);
             }
