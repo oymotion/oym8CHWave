@@ -5,6 +5,6 @@ Capture EMG signals from GForcePro and play sound according to individual channe
 Requests to play note for any channel if EMG signal is in valid region.  
 Sends bit masks to arduino.
 
-## oym8CHWave
+## oym8CHWaveArduino
 Receives uint8_t data which indicate channels to play note.  
 Plays note for each channel if relevant bit mask set.
