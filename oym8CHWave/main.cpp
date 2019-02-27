@@ -17,7 +17,7 @@ std::promise<bool> isPHubOK;
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
-
+  qRegisterMetaType<QVector<uint8_t>>("QVector<uint8_t>");
 
   MainWindow mainwindow;
   mainwindow.show();
@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
   auto pHub = HubManager::getHubInstance(identifer);
   auto gflistener = make_shared<gfSdkQml>(pHub, std::ref(mainwindow));
 
-  QObject::connect(gflistener.get(), SIGNAL(sendDeviceData(QVector<double>)),
-                   &mainwindow, SLOT(on_drawLine(QVector<double>)));
+  QObject::connect(gflistener.get(), SIGNAL(sendDeviceData(QVector<uint8_t>)),
+                   &mainwindow, SLOT(on_drawLine(QVector<uint8_t>)));
 
   QObject::connect(gflistener.get(), SIGNAL(deviceConnected()),
                    &mainwindow, SLOT(handleDeviceConnected()));

@@ -121,7 +121,7 @@ void MainWindow::ch_WindowInit()
   count = 0;
 }
 
-void MainWindow::on_drawLine(QVector<double> rawData)
+void MainWindow::on_drawLine(QVector<uint8_t> rawData)
 {
   if (rawData.size() == 128)
   {
@@ -137,11 +137,12 @@ void MainWindow::on_drawLine(QVector<double> rawData)
         ch_data[n].push_back(raw);
 
         uint8_t dataBack = filterProces(raw, n);
-        sendData = (sendData | dataBack << n);
+        sendData = static_cast<uint8_t>(sendData | dataBack << n);
       }  
 
       if (serialPort.isOpen())
       {
+        serialPort.clear();   // Discard data in buffer
         serialPort.write((char*)&sendData, 1);
       }
     }
