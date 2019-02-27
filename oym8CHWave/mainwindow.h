@@ -43,7 +43,7 @@ private slots:
 
   void on_actionConnect_triggered();
 
-  void on_drawLine(QVector<double> rawData);
+  void on_drawLine(QVector<uint8_t> rawData);
 
 
 protected:
