@@ -206,15 +206,15 @@
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>开始</string>
+     <string>Menu</string>
     </property>
     <addaction name="actionConnect"/>
-    <addaction name="actionStop"/>
+    <addaction name="actionExit"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -224,9 +224,12 @@
     <string>Connect</string>
    </property>
   </action>
-  <action name="actionStop">
+  <action name="actionExit">
    <property name="text">
-    <string>Stop</string>
+    <string>Exit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit</string>
    </property>
   </action>
  </widget>
