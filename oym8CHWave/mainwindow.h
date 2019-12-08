@@ -39,7 +39,7 @@ private slots:
   void handleDeviceDisconnected();
   void handleDeviceConnected();
 
-  void on_actionStop_triggered();
+  void on_actionExit_triggered();
 
   void on_actionConnect_triggered();
 

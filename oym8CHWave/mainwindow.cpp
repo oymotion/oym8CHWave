@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
     chBufRaw[i].begin(1024);
     chBufRawShort[i].begin(32);
   }
+
+  ui->statusBar->showMessage(tr("Waiting for gForce connection..."));
 }
 
 MainWindow::~MainWindow()
@@ -178,6 +180,7 @@ void MainWindow::handleDeviceDisconnected()
   {
     deviceConnected = false;
     QMessageBox::information(this, tr("Info"), tr("gForce disconnected."));
+    ui->statusBar->showMessage(tr("gForce disconnected."));
   }
 }
 
@@ -192,8 +195,13 @@ void MainWindow::handleReadyRead()
   //qDebug() << "serialPort.read: " << serialPort.read(1);
 }
 
-void MainWindow::on_actionStop_triggered()
+void MainWindow::on_actionExit_triggered()
 {
+  if (serialPort.isOpen())
+  {
+    serialPort.close();
+  }
+
   this->close();
 }
 
@@ -211,13 +219,13 @@ void MainWindow::on_actionConnect_triggered()
 
   if (serialPort.isOpen())
   {
-    ui->actionConnect->setText(tr("Disconnect"));
+    ui->actionConnect->setText(tr("Disconnect from speakers"));
 
     qDebug() <<"Connect Success";
   }
   else
   {
-    ui->actionConnect->setText(tr("Connect"));
+    ui->actionConnect->setText(tr("Connect to speakers"));
   }
 }
 
