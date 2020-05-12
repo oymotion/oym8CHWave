@@ -7,8 +7,11 @@
 #include <thread>
 #include <mutex>
 #include <QtSerialPort/QSerialPort>
+
 #include "CircleBuff.h"
 #include "qcustomplot/qcustomplot.h"
+#include "gflistener.h"
+
 
 namespace Ui {
   class MainWindow;
@@ -40,18 +43,21 @@ private slots:
   void handleDeviceConnected();
 
   void on_actionExit_triggered();
-
-  void on_actionConnect_triggered();
+  void on_actionConnectTogForce_triggered();
+  void on_actionConnectToSounPlayer_triggered();
 
   void on_drawLine(QVector<uint8_t> rawData);
-
-
 protected:
   friend class DialogConnect;
   QSerialPort serialPort;
 
 private:
   Ui::MainWindow *ui;
+
+  // create a instance of hub.
+  std::shared_ptr<Hub> mHub;
+
+  std::shared_ptr<gfListener> gflistener;
 
   static const int CHNUM = 8;
   const int THRESHOLD_MIN = 4;
@@ -71,7 +77,6 @@ private:
 
   CIRCLE_BUFFER<int> chBufRaw[CHNUM];
   CIRCLE_BUFFER<int> chBufRawShort[CHNUM];
-
 };
 
 #endif // MAINWINDOW_H

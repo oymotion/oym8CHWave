@@ -1,4 +1,4 @@
-/*
+﻿/*
    Copyright 2017, OYMotion Inc.
 
    Redistribution and use in source and binary forms, with or without
@@ -34,9 +34,18 @@
 #include<QTime>
 #include <QtGlobal>
 #include <qdebug.h>
-#include "gfsdkqml.h"
-#include "dialogconnect.h"
+#include <iostream>
+#include <thread>
+#include <atomic>
+#include <functional>
+#include <future>
+#include <memory>
+#include <qdebug.h>
+
 #include "qcustomplot/qcustomplot.h"
+#include "dialogconnect.h"
+#include "dialogdevice.h"
+#include "gflistener.h"
 
 
 QT_USE_NAMESPACE
@@ -72,7 +81,32 @@ MainWindow::MainWindow(QWidget *parent) :
   }
 
   ui->statusBar->showMessage(tr("Waiting for gForce connection..."));
+
+
+
+  mHub = HubManager::getHubInstance(_T("gForce"));
+
+  gflistener = std::make_shared<gfListener>(mHub, this);
+
+  QObject::connect(gflistener.get(), SIGNAL(sendDeviceData(QVector<uint8_t>)),
+                   this, SLOT(on_drawLine(QVector<uint8_t>)));
+
+  QObject::connect(gflistener.get(), SIGNAL(deviceConnected()),
+                   this, SLOT(handleDeviceConnected()));
+
+  QObject::connect(gflistener.get(), SIGNAL(deviceDisConnected()),
+                   this, SLOT(handleDeviceDisconnected()));
+
+
+  mHub->setWorkMode(WorkMode::Polling);
+
+  GF_RET_CODE retCode = GF_RET_CODE::GF_SUCCESS;
+  cout << __FUNCTION__ << " has been called." << endl;
+
+  retCode = mHub->registerListener(gflistener);
+  cout << "registerListener " << ((retCode == GF_RET_CODE::GF_SUCCESS) ? "SUCCESS" : "FAIL") << endl;
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -80,6 +114,10 @@ MainWindow::~MainWindow()
   {
     serialPort.close();  //退出时关闭串口
   }
+
+  // release phub resource
+  mHub->unRegisterListener(gflistener);
+  mHub->deinit();
 
   delete ui;
 }
@@ -205,7 +243,23 @@ void MainWindow::on_actionExit_triggered()
   this->close();
 }
 
-void MainWindow::on_actionConnect_triggered()
+
+void MainWindow::on_actionConnectTogForce_triggered()
+{
+    if (gflistener->getDeviceStatus())
+    {
+        if (QMessageBox::question(this, tr("Disconnect?"), tr("gForce is connected, disconnected first?")) != QMessageBox::Yes)
+            return;
+
+        gflistener->disconnectDevice();
+    }
+
+    DialogDevice dlgDevice(mHub, gflistener);
+    dlgDevice.exec();
+}
+
+
+void MainWindow::on_actionConnectToSounPlayer_triggered()
 {
   if (serialPort.isOpen())
   {
@@ -219,13 +273,13 @@ void MainWindow::on_actionConnect_triggered()
 
   if (serialPort.isOpen())
   {
-    ui->actionConnect->setText(tr("Disconnect from speakers"));
+    ui->actionConnectToSounPlayer->setText(tr("Disconnect from speakers"));
 
     qDebug() <<"Connect Success";
   }
   else
   {
-    ui->actionConnect->setText(tr("Connect to speakers"));
+    ui->actionConnectToSounPlayer->setText(tr("Connect to speakers"));
   }
 }
 
@@ -247,5 +301,4 @@ uint8_t MainWindow::filterProces(int channelData, int CHNum)
     return 0x00;
   }
 }
-
 

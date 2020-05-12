@@ -42,7 +42,8 @@ void DialogConnect::on_buttonBox_accepted()
   mainWindow->serialPort.setPortName(ui->comboBox->currentText());
   mainWindow->serialPort.setBaudRate(QSerialPort::Baud115200);
 
-  if (mainWindow->serialPort.open(QIODevice::ReadWrite))
+  if (!mainWindow->serialPort.open(QIODevice::ReadWrite))
   {
+      QMessageBox::critical(this, tr("Error"), tr("Error when openning serial port."));
   }
 }
