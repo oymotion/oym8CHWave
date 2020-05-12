@@ -26,23 +26,24 @@ INCLUDEPATH += qcustomplot
 
 
 SOURCES += \
+    dialogdevice.cpp \
+    gflistener.cpp \
         main.cpp \
         mainwindow.cpp \
     qcustomplot/qcustomplot.cpp \
-    dialogconnect.cpp \
-    GfThread/gfthread.cpp \
-    gfsdkqml.cpp
+    dialogconnect.cpp
 
 HEADERS += \
+    dialogdevice.h \
+    gflistener.h \
         mainwindow.h \
     qcustomplot/qcustomplot.h \
     dialogconnect.h \
-    GfThread/gfthread.h \
-    gfsdkqml.h \
     third_party/gforce/inc/gforce.h \
     CircleBuff.h
 
 FORMS += \
+    dialogdevice.ui \
         mainwindow.ui \
     dialogconnect.ui
 
@@ -62,15 +63,7 @@ INCLUDEPATH += $$PWD/third_party/gforce
 DEPENDPATH += $$PWD/third_party/gforce
 
 #LIBS += $$PWD/third_party/gforce/gforce64.lib
-win32: LIBS += -L$$PWD/third_party/gforce/
-
-CONFIG(debug, debug|release) {
-    LIBS += -lgforce64d
-    message("debug")
-} else {
-    LIBS += -lgforce64
-    message("release")
-}
+win32: LIBS += -L$$PWD/third_party/gforce/ -lgforce64
 
 DISTFILES +=
 

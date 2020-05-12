@@ -206,22 +206,23 @@
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>Menu</string>
     </property>
-    <addaction name="actionConnect"/>
+    <addaction name="actionConnectTogForce"/>
+    <addaction name="actionConnectToSounPlayer"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionConnect">
+  <action name="actionConnectToSounPlayer">
    <property name="text">
-    <string>Connect</string>
+    <string>Connect To Sound Player</string>
    </property>
   </action>
   <action name="actionExit">
@@ -230,6 +231,11 @@
    </property>
    <property name="toolTip">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionConnectTogForce">
+   <property name="text">
+    <string>Connect To gForce</string>
    </property>
   </action>
  </widget>
