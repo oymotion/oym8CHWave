@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
       qApp->setStyleSheet(ts.readAll());
   }
 
+  ui->pushButtonRecord->setText(tr("Start Recording"));
+
   ch_WindowInit();   //波形显示界面初始化
 
   for (int i = 0; i < CHNUM; i++)  //初始化数据滤波存储数组
@@ -302,3 +304,29 @@ uint8_t MainWindow::filterProces(int channelData, int CHNum)
   }
 }
 
+
+void MainWindow::on_pushButtonRecord_clicked()
+{
+    gflistener->saveRawData("");
+
+    if (recordingFileName.isEmpty())
+    {
+        // Not recording, start
+
+        recordingFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
+        gflistener->saveRawData(recordingFileName);
+
+        ui->pushButtonRecord->setText(tr("Stop Recording"));
+    }
+    else
+    {
+        // Recording, stop
+        gflistener->finishSaveData();
+
+        // qDebug() << recordingFileName << "saved.";
+        QMessageBox::information(this, tr("File Saved"), tr("File '%1.bin' saved.").arg(recordingFileName));
+        recordingFileName.clear();
+
+        ui->pushButtonRecord->setText(tr("Start Recording"));
+    }
+}

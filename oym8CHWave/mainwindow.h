@@ -47,6 +47,9 @@ private slots:
   void on_actionConnectToSounPlayer_triggered();
 
   void on_drawLine(QVector<uint8_t> rawData);
+
+  void on_pushButtonRecord_clicked();
+
 protected:
   friend class DialogConnect;
   QSerialPort serialPort;
@@ -67,6 +70,7 @@ private:
   const int SHOW_MESSAGE_TIME = 5000;
 
   bool deviceConnected;
+  QString recordingFileName;
 
   QCustomPlot *plots[CHNUM];
 
