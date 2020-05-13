@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui printsupport serialport quick qml
+QT       += core gui printsupport serialport qml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
