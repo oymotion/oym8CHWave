@@ -26,6 +26,7 @@ INCLUDEPATH += qcustomplot
 
 
 SOURCES += \
+    dialogdatasetting.cpp \
     dialogdevice.cpp \
     gflistener.cpp \
         main.cpp \
@@ -34,6 +35,7 @@ SOURCES += \
     dialogconnect.cpp
 
 HEADERS += \
+    dialogdatasetting.h \
     dialogdevice.h \
     gflistener.h \
         mainwindow.h \
@@ -43,6 +45,7 @@ HEADERS += \
     CircleBuff.h
 
 FORMS += \
+    dialogdatasetting.ui \
     dialogdevice.ui \
         mainwindow.ui \
     dialogconnect.ui

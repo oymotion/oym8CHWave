@@ -3,6 +3,9 @@
 
 #include <QDebug>
 
+#include "dialogdatasetting.h"
+
+
 
 DialogDevice::DialogDevice(std::shared_ptr<gf::Hub> &hub, std::shared_ptr<gfListener> &listener, QWidget *parent) :
     QDialog(parent),
@@ -40,7 +43,13 @@ int DialogDevice::exec()
     if (ret == QDialog::Accepted && getSelectedDevice() != "")
     {
         qDebug() << "dlgDevice.getSelectedDevice(): " << getSelectedDevice();
-        listener->connectDevice(getSelectedDevice());
+
+        DialogDataSetting dlgDataSetting;
+
+        if (dlgDataSetting.exec() == QDialog::Accepted)
+        {
+            listener->connectDevice(getSelectedDevice(), dlgDataSetting.getDataBits(), dlgDataSetting.getDataRate());
+        }
     }
 
     return ret;

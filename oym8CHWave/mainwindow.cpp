@@ -165,12 +165,12 @@ void MainWindow::ch_WindowInit()
 
 void MainWindow::on_drawLine(QVector<uint8_t> rawData)
 {
-  if (rawData.size() == 128)
+  if (rawData.size() == 128/*8bit ADC*/ || rawData.size() == 64/*12bit ADC*/)
   {
     for (int i = 0; i < 16; i += 2)
     {
       x.push_back(count++);
-      uint8_t sendData = 0;
+      uint8_t sendData = 0; // Bit flags to indicate if play sound for channels
 
       for (int n = 0; n < CHNUM; ++n)
       {
@@ -178,9 +178,12 @@ void MainWindow::on_drawLine(QVector<uint8_t> rawData)
         int raw = rawData[i * CHNUM + n];
         ch_data[n].push_back(raw);
 
-        uint8_t dataBack = filterProces(raw, n);
-        sendData = static_cast<uint8_t>(sendData | dataBack << n);
-      }  
+        if (serialPort.isOpen())
+        {
+          uint8_t dataBack = doFilter(raw, n);
+          sendData = static_cast<uint8_t>(sendData | dataBack << n);
+        }
+      }
 
       if (serialPort.isOpen())
       {
@@ -286,13 +289,13 @@ void MainWindow::on_actionConnectToSounPlayer_triggered()
 }
 
 
-uint8_t MainWindow::filterProces(int channelData, int CHNum)
+uint8_t MainWindow::doFilter(int channelData, int CHNum)
 {
   chBufRaw[CHNum].write(channelData);
 
   chBufRawShort[CHNum].write(abs(channelData - chBufRaw[CHNum].readMean()));
 
-//  qDebug() <<"CHNum" << CHNum << chBufRaw[CHNum].readMean() << "chBufRawShort[CHNum].readMean()" << chBufRawShort[CHNum].readMean();
+  // qDebug() <<"CHNum" << CHNum << chBufRaw[CHNum].readMean() << "chBufRawShort[CHNum].readMean()" << chBufRawShort[CHNum].readMean();
 
   if ((chBufRawShort[CHNum].readMean() > THRESHOLD_MIN) && (chBufRawShort[CHNum].readMean() < THRESHOLD_MAX))
   {

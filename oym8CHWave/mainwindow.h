@@ -28,7 +28,7 @@ public:
 private:
   void sendString(const QString& str);  // Use this to avoid race condition of serial port.
 
-  uint8_t filterProces(int channeldata, int CHNum);
+  uint8_t doFilter(int channeldata, int CHNum); // Check if need to play sound for channel, returns 0 or 1
 
 signals:
 
