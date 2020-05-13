@@ -56,6 +56,9 @@ signals:
     void deviceDisConnected();
 
 public:
+    enum DATA_BITS {DATA_BITS_8 = 8, DATA_BITS_12 = 12};
+    enum DATA_RATE {DATA_RATE_100 = 100, DATA_RATE_200 = 200, DATA_RATE_250 = 250, DATA_RATE_400 = 400, DATA_RATE_500 = 500, DATA_RATE_650 = 650};
+
     Q_INVOKABLE void saveRawData(QString fileName);
     Q_INVOKABLE void finishSaveData();
     // Q_INVOKABLE void setDataType(int dataType);
@@ -64,7 +67,7 @@ public:
     Q_INVOKABLE void finishSaveQuaternionData();
     Q_INVOKABLE bool getDeviceStatus();
     //
-    Q_INVOKABLE void connectDevice(const QString &devName);
+    Q_INVOKABLE void connectDevice(const QString &devName, const DATA_BITS dataBits=DATA_BITS_8, const DATA_RATE dataRate=DATA_RATE_500);
     Q_INVOKABLE void disconnectDevice();
 
 private:
@@ -76,6 +79,9 @@ private:
     QVector<std::shared_ptr<Device>> mFoundDevices;
 
     bool mDConnectStatus = false;
+
+    DATA_BITS mDataBits;
+    DATA_RATE mDataRate;
 
     bool isSaveRawData;
     bool isSaveQuaternionData;

@@ -141,14 +141,13 @@ void gfListener::onDeviceConnected(SPDEVICE device)
 
         if (nullptr != setting)
         {
-            setting->setEMGRawDataConfig(200,         //sample rate
+            setting->setEMGRawDataConfig(mDataRate,         //sample rate
                                          (DeviceSetting::EMGRowDataChannels)(0x00FF),  //channel 0~7
-                                         128,    //data length
-                                         8,       // adc resolution
+                                         128,               //data length
+                                         mDataBits,         // adc resolution
                                          [setting](ResponseResult result) {
                 string ret = (result == ResponseResult::RREST_SUCCESS) ? ("sucess") : ("failed");
-                cout << "[INFO]: Set Emg Config "<< ret << endl;
-                qDebug() <<"Set Emg Config ";
+                qDebug() <<"setEMGRawDataConfig() returned:" << ret.c_str();
 
                 DeviceSetting::DataNotifFlags flags;
                 flags = (DeviceSetting::DataNotifFlags)
@@ -157,7 +156,7 @@ void gfListener::onDeviceConnected(SPDEVICE device)
                          //| DeviceSetting::DNF_GYROSCOPE
                          //| DeviceSetting::DNF_MAGNETOMETER
                          //| DeviceSetting::DNF_EULERANGLE
-                         | DeviceSetting::DNF_QUATERNION
+                         //| DeviceSetting::DNF_QUATERNION
                          //| DeviceSetting::DNF_ROTATIONMATRIX
                          //| DeviceSetting::DNF_EMG_GESTURE
                          | DeviceSetting::DNF_EMG_RAW
@@ -167,7 +166,7 @@ void gfListener::onDeviceConnected(SPDEVICE device)
                          );
 
                 setting->setDataNotifSwitch(flags, [](ResponseResult result) {
-                    cout << "setDataNotifSwitch: " << static_cast<GF_UINT32>(result) << endl;
+                    cout << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result) << endl;
                 });
             });
 
@@ -199,6 +198,8 @@ void gfListener::onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason)
 /// This callback is called when the quaternion data is received
 void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
 {
+    Q_UNUSED(device)
+
     // print the quaternion data
 //    cout << __FUNCTION__ << " has been called. " << rotation.toString() << endl;
 //    QVector<float> dataTemp;
@@ -213,6 +214,7 @@ void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
     //emit sendQuaternion(dataTemp);
      QJSEngine JS;
      QJSValue array = JS.newArray();
+
      array.setProperty(0, rotation.w());
      array.setProperty(1, rotation.x());
      array.setProperty(2, rotation.y());
@@ -242,6 +244,8 @@ void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
 /// This callback is called when the gesture data is recevied
 void gfListener::onGestureData(SPDEVICE device, Gesture gest)
 {
+    Q_UNUSED(device)
+
     // a gesture event coming.
     string gesture;
     switch (gest)
@@ -283,7 +287,10 @@ void gfListener::onGestureData(SPDEVICE device, Gesture gest)
 /// This callback is called when the button on gForce is pressed by user
 void gfListener::onDeviceStatusChanged(SPDEVICE device, DeviceStatus status)
 {
+    Q_UNUSED(device)
+
     string devicestatus;
+
     switch (status)
     {
     case DeviceStatus::ReCenter:
@@ -299,37 +306,61 @@ void gfListener::onDeviceStatusChanged(SPDEVICE device, DeviceStatus status)
         devicestatus = "Motionless";
         break;
     default:
-    {
-        devicestatus = "Undefined: ";
-        string s;
-        stringstream ss(s);
-        ss << static_cast<int>(status);
-        devicestatus += ss.str();
-    }
+        {
+            devicestatus = "Undefined: ";
+            string s;
+            stringstream ss(s);
+            ss << static_cast<int>(status);
+            devicestatus += ss.str();
+        }
     }
     cout << __FUNCTION__ << " has been called. " << devicestatus << endl;
 }
 
 void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, gfsPtr<const std::vector<GF_UINT8>> data)
 {
+    Q_UNUSED(device)
+
+    // qDebug() << "dataType:" << static_cast<GF_UINT32>(dataType) << ", dataLen:" << data->size();
+
     switch (dataType) {
     case DeviceDataType::DDT_EMGRAW:
         {
-
             // qvector, must be RawData;
-            if (128 == data->size()) {
+            if (128 == data->size())
+            {
                 QVector<uint8_t> tempRawData;
-                for (int i = 0; i < data->size(); ++i) {
-                    tempRawData.push_back((*data)[i]);
+
+                if (mDataBits == DATA_BITS_12)
+                {
+                    for (size_t i = 0; i < data->size(); i += 2)
+                    {
+                        // 12bit -> 8bit
+                        tempRawData.push_back(static_cast<uint8_t>((data->at(i) + (data->at(i + 1) << 8)) >> 4));
+                    }
                 }
+                else if (mDataBits == DATA_BITS_8)
+                {
+                    for (size_t i = 0; i < data->size(); ++i)
+                    {
+                        tempRawData.push_back(data->at(i));
+                    }
+                }
+                else
+                {
+                    break;
+                }
+
                 emit sendDeviceData(tempRawData);
             }
 
             // save raw data
-            if (isSaveRawData) {
+            if (isSaveRawData)
+            {
                 //save raw data with format
-                if (g_file.is_open()) {
-                    g_file.write((const char *)&(*data)[0], data->size());
+                if (g_file.is_open())
+                {
+                    g_file.write((const char*)data->data(), data->size());
                 }
             }
         }
@@ -346,8 +377,12 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
 }
 
 
-void gfListener::connectDevice(const QString &devName) {
+void gfListener::connectDevice(const QString &devName, const DATA_BITS dataBits, const DATA_RATE dataRate) {
     SPDEVICE device = nullptr;
+
+    qDebug() << "devName:" << devName << ", dataBits:" << dataBits << ", dataRate:" << dataRate;
+    mDataBits = dataBits;   // Save for later use
+    mDataRate = dataRate;
 
     for (auto dev : mFoundDevices)
     {
