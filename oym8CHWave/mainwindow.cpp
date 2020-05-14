@@ -167,7 +167,7 @@ void MainWindow::on_drawLine(QVector<uint8_t> rawData)
 {
   if (rawData.size() == 128/*8bit ADC*/ || rawData.size() == 64/*12bit ADC*/)
   {
-    for (int i = 0; i < 16; i += 2)
+    for (int i = 0; i < rawData.size() / 8; i++)
     {
       x.push_back(count++);
       uint8_t sendData = 0; // Bit flags to indicate if play sound for channels
