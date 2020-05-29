@@ -39,8 +39,9 @@ private slots:
 
   void handleReadyRead();
 
-  void handleDeviceDisconnected();
   void handleDeviceConnected();
+  void handleDeviceDisconnected();
+  void handleEmgSettingFailed();
 
   void on_actionExit_triggered();
   void on_actionConnectTogForce_triggered();
