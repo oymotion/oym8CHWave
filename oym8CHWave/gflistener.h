@@ -54,6 +54,7 @@ signals:
     void deviceFound(QString devName, unsigned int rssi);
     void deviceConnected();
     void deviceDisConnected();
+    void emgSettingFailed();
 
 public:
     enum DATA_BITS {DATA_BITS_8 = 8, DATA_BITS_12 = 12};
@@ -69,6 +70,9 @@ public:
     //
     Q_INVOKABLE void connectDevice(const QString &devName, const DATA_BITS dataBits=DATA_BITS_8, const DATA_RATE dataRate=DATA_RATE_500);
     Q_INVOKABLE void disconnectDevice();
+
+    DATA_BITS getDataBits() {return mDataBits;}
+    DATA_RATE getDataRate() {return mDataRate;}
 
 private:
     std::shared_ptr<QThread> gfThread;

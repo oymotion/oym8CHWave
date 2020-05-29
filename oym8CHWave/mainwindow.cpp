@@ -99,6 +99,8 @@ MainWindow::MainWindow(QWidget *parent) :
   QObject::connect(gflistener.get(), SIGNAL(deviceDisConnected()),
                    this, SLOT(handleDeviceDisconnected()));
 
+  QObject::connect(gflistener.get(), SIGNAL(emgSettingFailed()),
+                   this, SLOT(handleEmgSettingFailed()));
 
   mHub->setWorkMode(WorkMode::Polling);
 
@@ -217,6 +219,14 @@ void MainWindow::on_drawLine(QVector<uint8_t> rawData)
   }
 }
 
+void MainWindow::handleDeviceConnected()
+{
+  deviceConnected = true;
+  ui->statusBar->showMessage(tr("gForce connected."), SHOW_MESSAGE_TIME);
+
+  ui->pushButtonRecord->setEnabled(true);
+}
+
 void MainWindow::handleDeviceDisconnected()
 {
   if (deviceConnected)
@@ -227,10 +237,10 @@ void MainWindow::handleDeviceDisconnected()
   }
 }
 
-void MainWindow::handleDeviceConnected()
+void MainWindow::handleEmgSettingFailed()
 {
-  deviceConnected = true;
-  ui->statusBar->showMessage(tr("gForce connected."), SHOW_MESSAGE_TIME);
+    QMessageBox::critical(this, tr("Error"), tr("EMG setting failed!\nPlease disconnect then connect again."));
+    ui->statusBar->showMessage(tr("EMG setting failed!"));
 }
 
 void MainWindow::handleReadyRead()
@@ -316,7 +326,7 @@ void MainWindow::on_pushButtonRecord_clicked()
     {
         // Not recording, start
 
-        recordingFileName = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
+        recordingFileName = QString("EMG_%1_%2bits_%3Hz").arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")).arg(gflistener->getDataBits()).arg(gflistener->getDataRate());
         gflistener->saveRawData(recordingFileName);
 
         ui->pushButtonRecord->setText(tr("Stop Recording"));
@@ -327,9 +337,24 @@ void MainWindow::on_pushButtonRecord_clicked()
         gflistener->finishSaveData();
 
         // qDebug() << recordingFileName << "saved.";
-        QMessageBox::information(this, tr("File Saved"), tr("File '%1.bin' saved.").arg(recordingFileName));
+        if (QMessageBox::question(this, tr("File Saved"), tr("File '%1.bin' saved.\nSave to another place?").arg(recordingFileName), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        {
+            QString newFilename = QFileDialog::getSaveFileName(this, tr("Save as"), ".", "Binary file (*.bin)");
+
+            if (newFilename.length() != 0)
+            {
+                bool renamed = QFile::rename(recordingFileName + ".bin", newFilename);
+
+                if (renamed)
+                {
+                    QMessageBox::information(this, tr("File renamed"), tr("File '%1.bin' renamed to '%2'").arg(recordingFileName).arg(newFilename));
+                }
+            }
+        }
+
         recordingFileName.clear();
 
         ui->pushButtonRecord->setText(tr("Start Recording"));
+        ui->pushButtonRecord->setEnabled(deviceConnected);
     }
 }

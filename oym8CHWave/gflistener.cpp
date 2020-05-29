@@ -89,7 +89,7 @@ gfListener::gfListener(std::shared_ptr<Hub> hub, QObject *parent) :QObject(paren
 
 gfListener::~gfListener()
 {
-    qDebug("~gfSdk()");
+    qDebug("~gfListener()");
     finishSaveData();
 
     gfThread->requestInterruption();
@@ -149,25 +149,28 @@ void gfListener::onDeviceConnected(SPDEVICE device)
                 string ret = (result == ResponseResult::RREST_SUCCESS) ? ("sucess") : ("failed");
                 qDebug() <<"setEMGRawDataConfig() returned:" << ret.c_str();
 
-                DeviceSetting::DataNotifFlags flags;
-                flags = (DeviceSetting::DataNotifFlags)
-                        (DeviceSetting::DNF_OFF
-                         //| DeviceSetting::DNF_ACCELERATE
-                         //| DeviceSetting::DNF_GYROSCOPE
-                         //| DeviceSetting::DNF_MAGNETOMETER
-                         //| DeviceSetting::DNF_EULERANGLE
-                         //| DeviceSetting::DNF_QUATERNION
-                         //| DeviceSetting::DNF_ROTATIONMATRIX
-                         //| DeviceSetting::DNF_EMG_GESTURE
-                         | DeviceSetting::DNF_EMG_RAW
-                         //| DeviceSetting::DNF_HID_MOUSE
-                         //| DeviceSetting::DNF_HID_JOYSTICK
-                         //| DeviceSetting::DNF_DEVICE_STATUS
-                         );
+                if (result == ResponseResult::RREST_SUCCESS)
+                {
+                    DeviceSetting::DataNotifFlags flags;
+                    flags = (DeviceSetting::DataNotifFlags)
+                            (DeviceSetting::DNF_OFF
+                             //| DeviceSetting::DNF_ACCELERATE
+                             //| DeviceSetting::DNF_GYROSCOPE
+                             //| DeviceSetting::DNF_MAGNETOMETER
+                             //| DeviceSetting::DNF_EULERANGLE
+                             //| DeviceSetting::DNF_QUATERNION
+                             //| DeviceSetting::DNF_ROTATIONMATRIX
+                             //| DeviceSetting::DNF_EMG_GESTURE
+                             | DeviceSetting::DNF_EMG_RAW
+                             //| DeviceSetting::DNF_HID_MOUSE
+                             //| DeviceSetting::DNF_HID_JOYSTICK
+                             //| DeviceSetting::DNF_DEVICE_STATUS
+                             );
 
-                setting->setDataNotifSwitch(flags, [](ResponseResult result) {
-                    cout << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result) << endl;
-                });
+                    setting->setDataNotifSwitch(flags, [](ResponseResult result) {
+                        cout << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result) << endl;
+                    });
+                }
             });
 
         }
