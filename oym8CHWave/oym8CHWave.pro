@@ -74,7 +74,5 @@ RESOURCES += \
     image.qrc \
     qdarkstyle/style.qrc
 
-
-
-
+TRANSLATIONS = zh_CN.ts
 

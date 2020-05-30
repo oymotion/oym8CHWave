@@ -25,7 +25,7 @@
        <bool>false</bool>
       </property>
       <property name="text">
-       <string>Record</string>
+       <string>Start Recording</string>
       </property>
      </widget>
     </item>
