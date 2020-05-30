@@ -44,9 +44,9 @@
    <widget class="QRadioButton" name="radioButton_12bit">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>110</x>
       <y>30</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -59,7 +59,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -86,9 +86,9 @@
    <widget class="QRadioButton" name="radioButton_650Hz">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>210</x>
       <y>60</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -99,9 +99,9 @@
    <widget class="QRadioButton" name="radioButton_500Hz">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>110</x>
       <y>60</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -115,9 +115,9 @@
    <widget class="QRadioButton" name="radioButton_250Hz">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>210</x>
       <y>30</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -130,7 +130,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -141,9 +141,9 @@
    <widget class="QRadioButton" name="radioButton_200Hz">
     <property name="geometry">
      <rect>
-      <x>100</x>
+      <x>110</x>
       <y>30</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
@@ -156,7 +156,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>61</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
