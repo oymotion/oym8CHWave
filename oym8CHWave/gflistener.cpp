@@ -138,6 +138,7 @@ void gfListener::onDeviceConnected(SPDEVICE device)
     if (mDevice)
     {
         auto setting = mDevice->getDeviceSetting();
+        auto listener = this;
 
         if (nullptr != setting)
         {
@@ -145,7 +146,7 @@ void gfListener::onDeviceConnected(SPDEVICE device)
                                          (DeviceSetting::EMGRowDataChannels)(0x00FF),  //channel 0~7
                                          128,               //data length
                                          mDataBits,         // adc resolution
-                                         [setting](ResponseResult result) {
+                                         [listener, setting](ResponseResult result) {
                 string ret = (result == ResponseResult::RREST_SUCCESS) ? ("sucess") : ("failed");
                 qDebug() <<"setEMGRawDataConfig() returned:" << ret.c_str();
 
@@ -170,6 +171,10 @@ void gfListener::onDeviceConnected(SPDEVICE device)
                     setting->setDataNotifSwitch(flags, [](ResponseResult result) {
                         cout << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result) << endl;
                     });
+                }
+                else
+                {
+                    emit listener->emgSettingFailed();
                 }
             });
 

@@ -126,6 +126,7 @@ MainWindow::~MainWindow()
   delete ui;
 }
 
+
 void MainWindow::ch_WindowInit()
 {
   //初始化控件数组
@@ -164,6 +165,7 @@ void MainWindow::ch_WindowInit()
   x.clear();
   count = 0;
 }
+
 
 void MainWindow::on_drawLine(QVector<uint8_t> rawData)
 {
@@ -219,6 +221,7 @@ void MainWindow::on_drawLine(QVector<uint8_t> rawData)
   }
 }
 
+
 void MainWindow::handleDeviceConnected()
 {
   deviceConnected = true;
@@ -227,6 +230,7 @@ void MainWindow::handleDeviceConnected()
   ui->pushButtonRecord->setEnabled(true);
 }
 
+
 void MainWindow::handleDeviceDisconnected()
 {
   if (deviceConnected)
@@ -234,8 +238,19 @@ void MainWindow::handleDeviceDisconnected()
     deviceConnected = false;
     QMessageBox::information(this, tr("Info"), tr("gForce disconnected."));
     ui->statusBar->showMessage(tr("gForce disconnected."));
+
+    if (recordingFileName.isEmpty())
+    {
+        // Not recording, can disable it now
+        ui->pushButtonRecord->setEnabled(false);
+    }
+    else
+    {
+        // Save file?
+    }
   }
 }
+
 
 void MainWindow::handleEmgSettingFailed()
 {
@@ -243,10 +258,12 @@ void MainWindow::handleEmgSettingFailed()
     ui->statusBar->showMessage(tr("EMG setting failed!"));
 }
 
+
 void MainWindow::handleReadyRead()
 {
   //qDebug() << "serialPort.read: " << serialPort.read(1);
 }
+
 
 void MainWindow::on_actionExit_triggered()
 {
@@ -288,13 +305,13 @@ void MainWindow::on_actionConnectToSounPlayer_triggered()
 
   if (serialPort.isOpen())
   {
-    ui->actionConnectToSounPlayer->setText(tr("Disconnect from speakers"));
+    ui->actionConnectToSounPlayer->setText(tr("Disconnect from Sound Player"));
 
     qDebug() <<"Connect Success";
   }
   else
   {
-    ui->actionConnectToSounPlayer->setText(tr("Connect to speakers"));
+    ui->actionConnectToSounPlayer->setText(tr("Connect to Sound Player"));
   }
 }
 
@@ -320,13 +337,18 @@ uint8_t MainWindow::doFilter(int channelData, int CHNum)
 
 void MainWindow::on_pushButtonRecord_clicked()
 {
-    gflistener->saveRawData("");
-
     if (recordingFileName.isEmpty())
     {
         // Not recording, start
 
-        recordingFileName = QString("EMG_%1_%2bits_%3Hz").arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")).arg(gflistener->getDataBits()).arg(gflistener->getDataRate());
+        auto currentDir = QDir::current();
+
+        if (!currentDir.exists("data"))
+        {
+            currentDir.mkdir("data");
+        }
+
+        recordingFileName = (QString("data") + QDir::separator() + QString("EMG_%1_%2bits_%3Hz")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")).arg(gflistener->getDataBits()).arg(gflistener->getDataRate());
         gflistener->saveRawData(recordingFileName);
 
         ui->pushButtonRecord->setText(tr("Stop Recording"));
@@ -335,6 +357,7 @@ void MainWindow::on_pushButtonRecord_clicked()
     {
         // Recording, stop
         gflistener->finishSaveData();
+        gflistener->saveRawData("");
 
         // qDebug() << recordingFileName << "saved.";
         if (QMessageBox::question(this, tr("File Saved"), tr("File '%1.bin' saved.\nSave to another place?").arg(recordingFileName), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
