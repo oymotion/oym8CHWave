@@ -1,10 +1,9 @@
 # oym8CHWave
-Capture EMG signals from GForcePro and play sound according to individual channel signal.
+Captures EMG signals from GForcePro and play sound according to individual channel signal.
 
 ## oym8CHWave
-Requests to play note for any channel if EMG signal is in valid region.  
-Sends bit masks to arduino.
+Displays waveforms according to EMG data from gForcePro. Sends sound on/off bit flags to oym8CHWaveArduino if oym8CHWaveArduino is connected.
 
 ## oym8CHWaveArduino
-Receives uint8_t data which indicate channels to play note.  
+Receives sound on/off bit flags which indicate channels to play note.  
 Plays note for each channel if relevant bit mask set.
