@@ -75,6 +75,8 @@ public:
     DATA_RATE getDataRate() {return mDataRate;}
 
 private:
+    QString fullDevName(SPDEVICE device);
+
     std::shared_ptr<QThread> gfThread;
 
     // create a device to operate
