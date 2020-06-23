@@ -98,6 +98,26 @@ gfListener::~gfListener()
 }
 
 
+QString gfListener::fullDevName(SPDEVICE device)
+{
+    QString fullName = QString::fromStdWString(device->getName());
+
+    if (fullName.at(fullName.length() - 1) != ')')
+    {
+        auto address = QString::fromStdWString(device->getAddress());
+
+        fullName += "(";
+        fullName += address.at(3);
+        fullName += address.at(4);
+        fullName += address.at(0);
+        fullName += address.at(1);
+        fullName += ")";
+    }
+
+    return fullName;
+}
+
+
 /// This callback is called when the Hub finishes scanning devices.
 void gfListener::onScanFinished()
 {
@@ -125,7 +145,7 @@ void gfListener::onDeviceFound(SPDEVICE device)
     mFoundDevices.push_back(device);
 
     // send deviceFound signal
-    emit deviceFound(QString::fromStdWString(device->getName()), device->getRssi());
+    emit deviceFound(fullDevName(device), device->getRssi());
 }
 
 /// This callback is called a device has been connected successfully
@@ -394,8 +414,9 @@ void gfListener::connectDevice(const QString &devName, const DATA_BITS dataBits,
 
     for (auto dev : mFoundDevices)
     {
-        if (dev->getName() == devName)
+        if (fullDevName(dev) == devName)
         {
+            qDebug() << "Connect to device:" << devName;
             device = dev;
             break;
         }
