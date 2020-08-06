@@ -21,6 +21,13 @@ public:
     gfListener::DATA_BITS getDataBits();
     gfListener::DATA_RATE getDataRate();
 
+private slots:
+    void on_radioButton_12bit_clicked();
+
+    void on_radioButton_650Hz_clicked();
+
+    void on_radioButton_1000Hz_clicked();
+
 private:
     Ui::DialogDataSetting *ui;
 };

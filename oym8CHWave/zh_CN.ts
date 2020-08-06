@@ -81,6 +81,11 @@
         <source>400Hz</source>
         <translation>400赫兹</translation>
     </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="177"/>
+        <source>1000Hz</source>
+        <translation>1000赫兹</translation>
+    </message>
 </context>
 <context>
     <name>DialogDevice</name>
@@ -169,13 +174,6 @@
         <location filename="mainwindow.ui" line="248"/>
         <source>Connect To gForce</source>
         <translation>连接到gForce</translation>
-    </message>
-    <message>
-        <location filename="mainwindow.ui" line="28"/>
-        <location filename="mainwindow.cpp" line="75"/>
-        <location filename="mainwindow.cpp" line="380"/>
-        <source>Start Recording</source>
-        <translation>开始记录数据</translation>
     </message>
     <message>
         <location filename="mainwindow.cpp" line="85"/>
