@@ -32,6 +32,8 @@ private:
 
     std::shared_ptr<gf::Hub> hub;
     std::shared_ptr<gfListener> listener;
+
+    int scanTurnsLeft;
 };
 
 #endif // DIALOGDEVICE_H
