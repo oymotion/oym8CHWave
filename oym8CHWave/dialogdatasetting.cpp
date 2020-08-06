@@ -23,7 +23,9 @@ gfListener::DATA_BITS DialogDataSetting::getDataBits()
 
 gfListener::DATA_RATE DialogDataSetting::getDataRate()
 {
-    if (ui->radioButton_650Hz->isChecked())
+    if (ui->radioButton_1000Hz->isChecked())
+        return gfListener::DATA_RATE_1000;
+    else if (ui->radioButton_650Hz->isChecked())
         return gfListener::DATA_RATE_650;
     else if (ui->radioButton_500Hz->isChecked())
         return gfListener::DATA_RATE_500;
@@ -35,4 +37,22 @@ gfListener::DATA_RATE DialogDataSetting::getDataRate()
         return gfListener::DATA_RATE_200;
     else /*if (ui->radioButton_100Hz->isChecked())*/
         return gfListener::DATA_RATE_100;
+}
+
+void DialogDataSetting::on_radioButton_12bit_clicked()
+{
+    if (ui->radioButton_1000Hz->isChecked()|| ui->radioButton_650Hz->isChecked())
+    {
+        ui->radioButton_500Hz->setChecked(true);
+    }
+}
+
+void DialogDataSetting::on_radioButton_650Hz_clicked()
+{
+    ui->radioButton_8bit->setChecked(true);
+}
+
+void DialogDataSetting::on_radioButton_1000Hz_clicked()
+{
+    ui->radioButton_8bit->setChecked(true);
 }

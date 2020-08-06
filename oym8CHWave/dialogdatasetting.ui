@@ -86,9 +86,9 @@
    <widget class="QRadioButton" name="radioButton_650Hz">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>170</x>
       <y>60</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -99,9 +99,9 @@
    <widget class="QRadioButton" name="radioButton_500Hz">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>60</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -115,9 +115,9 @@
    <widget class="QRadioButton" name="radioButton_250Hz">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>170</x>
       <y>30</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -130,7 +130,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -141,9 +141,9 @@
    <widget class="QRadioButton" name="radioButton_200Hz">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>90</x>
       <y>30</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -156,7 +156,7 @@
      <rect>
       <x>10</x>
       <y>60</y>
-      <width>91</width>
+      <width>71</width>
       <height>16</height>
      </rect>
     </property>
@@ -164,8 +164,32 @@
      <string>400Hz</string>
     </property>
    </widget>
+   <widget class="QRadioButton" name="radioButton_1000Hz">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>60</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1000Hz</string>
+    </property>
+   </widget>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>radioButton_8bit</tabstop>
+  <tabstop>radioButton_12bit</tabstop>
+  <tabstop>radioButton_100Hz</tabstop>
+  <tabstop>radioButton_200Hz</tabstop>
+  <tabstop>radioButton_250Hz</tabstop>
+  <tabstop>radioButton_400Hz</tabstop>
+  <tabstop>radioButton_500Hz</tabstop>
+  <tabstop>radioButton_650Hz</tabstop>
+  <tabstop>radioButton_1000Hz</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
