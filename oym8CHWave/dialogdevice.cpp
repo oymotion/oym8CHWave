@@ -38,6 +38,8 @@ int DialogDevice::exec()
 {
     auto ret = QDialog::exec();
 
+    qDebug() << "Stop scan";
+    scanTurnsLeft = 0;
     hub->stopScan();
 
     if (ret == QDialog::Accepted && getSelectedDevice() != "")
@@ -72,7 +74,25 @@ void DialogDevice::handleDeviceFound(QString devName, unsigned int rssi)
     qDebug() << __FUNCTION__ << "called.";
     qDebug() << devName << rssi;
 
-    ui->listWidgetDevices->addItem(devName + ", rssi=" + QString::number(rssi));
+    int i;
+
+    for (i=0; i<ui->listWidgetDevices->count(); i++)
+    {
+        auto item = ui->listWidgetDevices->item(i);
+
+
+        if (item->text().startsWith(devName))
+        {
+            item->setText(devName + ", rssi=" + QString::number(rssi));
+            break;
+        }
+    }
+
+    if (i == ui->listWidgetDevices->count())
+    {
+        // New
+        ui->listWidgetDevices->addItem(devName + ", rssi=" + QString::number(rssi));
+    }
 }
 
 
@@ -80,7 +100,10 @@ void DialogDevice::handleScanFinished()
 {
     qDebug() << __FUNCTION__ << "called.";
 
-    ui->pushButtonScan->setEnabled(true);
+    if (--scanTurnsLeft > 0)
+        hub->startScan(0);
+    else
+        ui->pushButtonScan->setEnabled(true);
 }
 
 void DialogDevice::on_pushButtonScan_clicked()
@@ -89,5 +112,7 @@ void DialogDevice::on_pushButtonScan_clicked()
 
     ui->pushButtonScan->setEnabled(false);
     ui->listWidgetDevices->clear();
+
+    scanTurnsLeft = 5;
     hub->startScan(0);
 }
