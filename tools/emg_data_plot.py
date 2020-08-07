@@ -43,7 +43,7 @@ def main(argv):
             val = 0
             data_bytes = file.read(byte_size)
 
-            for k in  reversed(range(byte_size)):
+            for k in reversed(range(byte_size)):
                 val = (val << 8) | data_bytes[k]
             # end for
 
@@ -55,16 +55,19 @@ def main(argv):
     file.close()
 
     col_count = 2
-    row_count = int(channel_cnt / col_count)
+    row_count = int((channel_cnt + col_count - 1) / col_count)
 
     fig, axs = plt.subplots(row_count, col_count)
 
     for i in range(row_count):
         for j in range(col_count):
             ch_index = i * col_count + j
-            # print("i=%d, j=%d, channel=%d" % (i, j, ch_index))
-            axs[i, j].plot(x[ch_index, :])
-            axs[i, j].set_title('Ch#' + str(ch_index))
+
+            if (ch_index < channel_cnt):
+                # print("i=%d, j=%d, channel=%d" % (i, j, ch_index))
+                axs[i, j].plot(x[ch_index, :])
+                axs[i, j].set_title('Ch#' + str(ch_index))
+            # end if
         # end for
     # end for
 
