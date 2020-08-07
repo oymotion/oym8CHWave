@@ -13,4 +13,6 @@ Plays note for each channel if relevant bit mask set.
 
 ## tools
 
-*bin2csv.py* : Script to convert binary data into CSV format
+*bin2csv.py* : Python script to convert binary data into CSV format
+*emg_data_plot.py* : Python script to plot EMG data
+*emg_data_plot.m* : Matlab code to plot EMG data
