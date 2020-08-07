@@ -43,7 +43,7 @@ def main(argv):
             val = 0
             data_bytes = file.read(byte_size)
 
-            for k in range(byte_size).reverse:
+            for k in  reversed(range(byte_size)):
                 val = (val << 8) | data_bytes[k]
             # end for
 
