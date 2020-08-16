@@ -48,7 +48,6 @@ def main(argv):
             # end for
 
             x[j, i] = val
-            # end if
         # end for
     # end for
 
