@@ -168,6 +168,15 @@ namespace gf {
 		WaveOut = 0x04,
 		Pinch = 0x05,
 		Shoot = 0x06,
+		UserDefine1 = 0x07,
+		UserDefine2 = 0x08,
+		UserDefine3 = 0x09,
+		UserDefine4 = 0x0A,
+		UserDefine5 = 0x0B,
+		UserDefine6 = 0x0C,
+		UserDefine7 = 0x0D,
+		UserDefine8 = 0x0E,
+		UserDefine9 = 0x0F,
 		Undefined = 0xFF
 	};
 

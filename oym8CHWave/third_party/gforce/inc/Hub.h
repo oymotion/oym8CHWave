@@ -111,7 +111,7 @@ namespace gf
 		/// \param rssiThreshold The threshold to filter devices.\n
 		///                      0 - use preset default value.
 		/// \return GF_RET_CODE type to indicate if the command sent to hub or not
-		virtual GF_RET_CODE startScan(GF_UINT8 rssiThreshold = 200) = 0;
+		virtual GF_RET_CODE startScan(GF_UINT8 rssiThreshold = 0) = 0;
 
 		/// \brief Stop gForce scan
 		///

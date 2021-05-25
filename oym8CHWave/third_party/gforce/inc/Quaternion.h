@@ -156,14 +156,14 @@ namespace gf
 			double test = mY*mZ + mX*mW;
 			if (std::abs(test) > 0.4999f){
 				int symbol = (test > 0.4999f) ? 1 : -1;
-                                yaw = symbol * 2 * std::atan2(mY, mW) * 180 / PI;
+				yaw = symbol * 2 * std::atan2f(mY, mW) * 180 / PI;
 				pitch = symbol * 90.f;
 				roll = 0.f;
 				return Euler(pitch, roll, yaw);
 			}
-                        yaw = std::atan2((2 * mZ*mW - 2 * mX*mY), (1 - 2 * mX*mX - 2 * mZ*mZ)) * 180 / PI;
+			yaw = std::atan2f((2 * mZ*mW - 2 * mX*mY), (1 - 2 * mX*mX - 2 * mZ*mZ)) * 180 / PI;
 			pitch = (float)std::asin(2 * test) * 180 / PI;
-                        roll = std::atan2((2 * mY*mW - 2 * mX*mZ), (1 - 2 * mX*mX - 2 * mY*mY)) * 180 / PI;
+			roll = std::atan2f((2 * mY*mW - 2 * mX*mZ), (1 - 2 * mX*mX - 2 * mY*mY)) * 180 / PI;
 			return Euler(pitch, roll, yaw);
 		}
 

@@ -65,8 +65,16 @@ INCLUDEPATH += $$PWD/third_party/gforce/inc
 INCLUDEPATH += $$PWD/third_party/gforce
 DEPENDPATH += $$PWD/third_party/gforce
 
-#LIBS += $$PWD/third_party/gforce/gforce64.lib
-win32: LIBS += -L$$PWD/third_party/gforce/ -lgforce64
+win32:CONFIG(debug, debug|release){
+    #LIBS += $$PWD/third_party/gforce/gforce64d.lib
+    LIBS += -L$$PWD/third_party/gforce/ -lgforce64d
+}
+
+win32:CONFIG(release, debug|release){
+    #LIBS += $$PWD/third_party/gforce/gforce64.lib
+    LIBS += -L$$PWD/third_party/gforce/ -lgforce64
+}
+
 
 DISTFILES +=
 

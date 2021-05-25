@@ -125,7 +125,11 @@ namespace gf
 			/// Data Notify All On
 			DNF_ALL = 0xFFFFFFFF,
 		};
-		virtual GF_RET_CODE setDataNotifSwitch(DataNotifFlags flags, std::function<void(ResponseResult res)> cb) = 0;
+
+		virtual GF_RET_CODE requestMtu(GF_UINT16 mtu) = 0;
+        virtual GF_RET_CODE enableDataNotification(GF_UINT8 enable) = 0;
+
+        virtual GF_RET_CODE setDataNotifSwitch(DataNotifFlags flags, std::function<void(ResponseResult res)> cb) = 0;
 
 		///////////////////////////////////////////////
 		virtual GF_RET_CODE getBatteryLevel( std::function<void(ResponseResult res, GF_UINT32 percentage)> cb) = 0;

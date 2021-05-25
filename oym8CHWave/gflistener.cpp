@@ -162,6 +162,8 @@ void gfListener::onDeviceConnected(SPDEVICE device)
 
         if (nullptr != setting)
         {
+            setting->enableDataNotification(0);
+
             setting->setEMGRawDataConfig(mDataRate,         //sample rate
                                          (DeviceSetting::EMGRowDataChannels)(0x00FF),  //channel 0~7
                                          128,               //data length
@@ -188,8 +190,9 @@ void gfListener::onDeviceConnected(SPDEVICE device)
                              //| DeviceSetting::DNF_DEVICE_STATUS
                              );
 
-                    setting->setDataNotifSwitch(flags, [](ResponseResult result) {
-                        cout << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result) << endl;
+                    setting->setDataNotifSwitch(flags, [setting](ResponseResult result) {
+                        qDebug() << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result);
+                        setting->enableDataNotification(1);
                     });
                 }
                 else
