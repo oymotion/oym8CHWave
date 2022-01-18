@@ -127,6 +127,11 @@
         <source>Quaternion</source>
         <translation>四元数</translation>
     </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="395"/>
+        <source>Note: Data will be saved to combined file when recording if data type checked besides EMG.</source>
+        <translation>提示：如果选择了EMG之外的数据类型，保存数据时将采用组合文件格式</translation>
+    </message>
 </context>
 <context>
     <name>DialogDevice</name>
@@ -151,7 +156,7 @@
     <message>
         <location filename="mainwindow.ui" line="28"/>
         <location filename="mainwindow.cpp" line="75"/>
-        <location filename="mainwindow.cpp" line="415"/>
+        <location filename="mainwindow.cpp" line="423"/>
         <source>Start Recording</source>
         <translation>记录到文件</translation>
     </message>
@@ -274,51 +279,51 @@ Please disconnect then connect again.</source>
         <translation>连接声效播放器</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="363"/>
+        <location filename="mainwindow.cpp" line="369"/>
         <source>Stop Recording</source>
         <translation>停止记录数据</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="375"/>
-        <location filename="mainwindow.cpp" line="397"/>
+        <location filename="mainwindow.cpp" line="380"/>
+        <location filename="mainwindow.cpp" line="404"/>
         <source>File Saved</source>
         <translation>文件已保存</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="375"/>
-        <source>File &apos;%1.bin&apos; saved.
+        <location filename="mainwindow.cpp" line="380"/>
+        <location filename="mainwindow.cpp" line="404"/>
+        <source>File &apos;%1&apos; saved.
 Save to another place?</source>
-        <translation>文件 &apos;%1.bin&apos; 已保存。
+        <translation>文件 &apos;%1&apos; 已保存。
 要另存到其它位置么？</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="377"/>
-        <location filename="mainwindow.cpp" line="399"/>
+        <location filename="mainwindow.cpp" line="390"/>
+        <location filename="mainwindow.cpp" line="414"/>
+        <source>File &apos;%1&apos; renamed to &apos;%2&apos;</source>
+        <translation>文件“%1”已被另存为“%2”</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="382"/>
+        <location filename="mainwindow.cpp" line="406"/>
         <source>Save as</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="385"/>
-        <location filename="mainwindow.cpp" line="407"/>
+        <location filename="mainwindow.cpp" line="382"/>
+        <source>Binary file (*.bin)</source>
+        <translation>二进制文件 (*.bin)</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="390"/>
+        <location filename="mainwindow.cpp" line="414"/>
         <source>File renamed</source>
         <translation>文件已另存</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="385"/>
-        <source>File &apos;%1.bin&apos; renamed to &apos;%2&apos;</source>
-        <translation>文件 &apos;%1.bin&apos; 已另存为 &apos;%2&apos;</translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="397"/>
-        <source>File &apos;%1.txt&apos; saved.
-Save to another place?</source>
-        <translation>文件“%1.txt”已保存，
-是否需要另存到其它位置？</translation>
-    </message>
-    <message>
-        <location filename="mainwindow.cpp" line="407"/>
-        <source>File &apos;%1.txt&apos; renamed to &apos;%2&apos;</source>
-        <translation>文件“%1.txt”已经被另存为“%2”</translation>
+        <location filename="mainwindow.cpp" line="406"/>
+        <source>JSON file (*.json)</source>
+        <translation>JSON文件 (*.json)</translation>
     </message>
 </context>
 </TS>

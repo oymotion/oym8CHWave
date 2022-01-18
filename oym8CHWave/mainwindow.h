@@ -72,7 +72,7 @@ private:
 
   bool deviceConnected;
   QString recordingEMGFileName;
-  QString recordingQuatFileName;
+  QString recordingCombinedFileName;
 
   QCustomPlot *plots[CHNUM];
 

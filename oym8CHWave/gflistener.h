@@ -103,12 +103,14 @@ public:
     };
 
 
-    Q_INVOKABLE void saveRawData(QString fileName);
-    Q_INVOKABLE void finishSaveData();
-    // Q_INVOKABLE void setDataType(int dataType);
-    // save quaternion
-    Q_INVOKABLE void saveQuaternionData(QString fileName);
-    Q_INVOKABLE void finishSaveQuaternionData();
+    // Save raw EMG data
+    Q_INVOKABLE void saveEMGRawData(QString fileName);
+    Q_INVOKABLE void finishSaveEMGRawData();
+
+    // Save combined data
+    Q_INVOKABLE void saveCombinedData(QString fileName);
+    Q_INVOKABLE void finishSaveCombinedData();
+
     Q_INVOKABLE bool getDeviceStatus();
     //
     Q_INVOKABLE void connectDevice(const QString &devName, const EMG_DATA_BITS emgDataBits, const EMG_DATA_RATE emgDataRate, const ACC_DATA_RATE accelDataRate, const GYRO_DATA_RATE gyroDataRate, const MAG_DATA_RATE magDataRate, const QUAT_DATA_RATE quatDataRate);
@@ -142,11 +144,14 @@ private:
     MAG_DATA_RATE mMagDataRate;
     QUAT_DATA_RATE mQuatDataRate;
 
-    bool isRecordingRawData;
-    bool isRecordingQuaternionData;
+    bool isRecordingEMGRawData;
+    bool isRecordingCombinedData;
+
     // file, object
-    ofstream g_file;
-    ofstream g_quaternionFile;
+    ofstream g_EMGfile;
+    ofstream g_combinedFile;
+
+    uint32_t timestampOffset;
 };
 
 #endif // GFLISTENER_H

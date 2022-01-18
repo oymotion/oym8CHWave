@@ -374,12 +374,37 @@
     </widget>
    </widget>
   </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>440</y>
+     <width>411</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+     <underline>true</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>Note: Data will be saved to combined file when recording if data type checked besides EMG.</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
   <zorder>groupBox_Quaternion</zorder>
   <zorder>groupBox_Magnetic</zorder>
   <zorder>groupBox_EMG</zorder>
   <zorder>buttonBox</zorder>
   <zorder>groupBox_Gyro</zorder>
   <zorder>groupBox_Accel</zorder>
+  <zorder>label</zorder>
  </widget>
  <tabstops>
   <tabstop>groupBox_Accel</tabstop>

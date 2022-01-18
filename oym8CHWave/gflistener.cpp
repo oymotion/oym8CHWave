@@ -78,8 +78,8 @@ private:
 
 
 gfListener::gfListener(std::shared_ptr<Hub> hub, QObject *parent) :QObject(parent),
-    isRecordingRawData(false),
-    isRecordingQuaternionData(false),
+    isRecordingEMGRawData(false),
+    isRecordingCombinedData(false),
     mDevice(nullptr)
 {
     gfThread = std::make_shared<GfThread>(hub);
@@ -90,7 +90,8 @@ gfListener::gfListener(std::shared_ptr<Hub> hub, QObject *parent) :QObject(paren
 gfListener::~gfListener()
 {
     qDebug("~gfListener()");
-    finishSaveData();
+    finishSaveEMGRawData();
+    finishSaveCombinedData();
 
     gfThread->requestInterruption();
     gfThread->quit();
@@ -284,22 +285,15 @@ void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
      array.setProperty(3, rotation.z());
      emit sendQuaternion(array.toVariant());
 
-     // save quaternion
-     if (isRecordingQuaternionData) {
-         //save quaternion data
-         if (g_quaternionFile.is_open()) {
-             g_quaternionFile << rotation.w();
-             g_quaternionFile << "  ";
-             g_quaternionFile << rotation.x();
-             g_quaternionFile << "  ";
-             g_quaternionFile << rotation.y();
-             g_quaternionFile << "  ";
-             g_quaternionFile << rotation.z();
-             g_quaternionFile << "\n";
-//             qDebug("rotation.w() = %f", rotation.w());
-//             qDebug("rotation.x() = %f", rotation.x());
-//             qDebug("rotation.y() = %f", rotation.y());
-//             qDebug("rotation.z() = %f", rotation.z());
+
+     if (isRecordingCombinedData)
+     {
+         if (g_combinedFile.is_open())
+         {
+             // Save quaternion data
+             g_combinedFile << QString::asprintf("    {\"timestamp\" : %ul, \"type\" : \"%s\", \"data\" : [%f, %f, %f, %f]}\n",
+                                                 QDateTime().currentMSecsSinceEpoch() - timestampOffset,
+                                                 "QUAT", rotation.w(), rotation.x(), rotation.y(), rotation.z()).toStdString();
          }
      }
 }
@@ -417,13 +411,44 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                 emit sendDeviceData(tempRawData);
             }
 
-            // save raw data
-            if (isRecordingRawData)
+            if (isRecordingEMGRawData)
             {
-                //save raw data with format
-                if (g_file.is_open())
+                if (g_EMGfile.is_open())
                 {
-                    g_file.write((const char*)data->data(), data->size());
+                    // Save raw data
+                    g_EMGfile.write((const char*)data->data(), data->size());
+                }
+            }
+            else if (isRecordingCombinedData)
+            {
+                if (g_combinedFile.is_open())
+                {
+                    // Save EMG data
+
+                    QString arrayString("[");
+
+                    if (mEMGDataBits == EMG_DATA_BITS_12)
+                    {
+                        for (size_t i = 0; i < data->size(); i += 2)
+                        {
+                            // Pack 12bit
+                            arrayString.append(QString::asprintf("0X04%X, ", data->at(i) + (data->at(i + 1) << 8)));
+                        }
+                    }
+                    else if (mEMGDataBits == EMG_DATA_BITS_8)
+                    {
+                        for (size_t i = 0; i < data->size(); ++i)
+                        {
+                            arrayString.append(QString::asprintf("0X02%X, ", data->at(i)));
+                        }
+                    }
+
+                    arrayString.chop(2);
+                    arrayString.append("]");
+
+                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"type\" : \"EMG\", \"data\" : " << arrayString.toStdString()
+                                   << "}\n";
                 }
             }
         }
@@ -431,23 +456,88 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
 
     case DeviceDataType::DDT_ACCELERATE:
         {
+            if (isRecordingCombinedData)
+            {
+                if (g_combinedFile.is_open())
+                {
+                    // Save accel data
+                    QString arrayString("[");
+
+                    for (size_t i = 0; i < data->size(); i += 4)
+                    {
+                        // Pack data
+                        int32_t q15 = data->at(i) + (data->at(i + 1) << 8) + (data->at(i + 2) << 16) + (data->at(i + 3) << 24);
+                        arrayString.append(QString::asprintf("%f, ", q15 / 65536.0f));
+                    }
+
+                    arrayString.chop(2);
+                    arrayString.append("]");
+
+                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"type\" : \"ACC\", \"data\" : " << arrayString.toStdString()
+                                   << "}\n";
+                }
+            }
         }
         break;
 
     case DeviceDataType::DDT_GYROSCOPE:
         {
+            if (isRecordingCombinedData)
+            {
+                if (g_combinedFile.is_open())
+                {
+                    // Save gyro data
+                    QString arrayString("[");
+
+                    for (size_t i = 0; i < data->size(); i += 4)
+                    {
+                        // Pack data
+                        int32_t q15 = data->at(i) + (data->at(i + 1) << 8) + (data->at(i + 2) << 16) + (data->at(i + 3) << 24);
+                        arrayString.append(QString::asprintf("%f, ", q15 / 65536.0f));
+                    }
+
+                    arrayString.chop(2);
+                    arrayString.append("]");
+
+                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"type\" : \"GYRO\", \"data\" : " << arrayString.toStdString()
+                                   << "}\n";
+                }
+            }
         }
         break;
 
     case DeviceDataType::DDT_MAGNETOMETER:
         {
+            if (isRecordingCombinedData)
+            {
+                if (g_combinedFile.is_open())
+                {
+                    // Save mag data
+                    QString arrayString("[");
+
+                    for (size_t i = 0; i < data->size(); i += 4)
+                    {
+                        // Pack data
+                        int32_t q15 = data->at(i) + (data->at(i + 1) << 8) + (data->at(i + 2) << 16) + (data->at(i + 3) << 24);
+                        arrayString.append(QString::asprintf("%f, ", q15 / 65536.0f));
+                    }
+
+                    arrayString.chop(2);
+                    arrayString.append("]");
+
+                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"type\" : \"MAG\", \"data\" : " << arrayString.toStdString()
+                                   << "}\n";
+                }
+            }
         }
         break;
 
-    case DeviceDataType::DDT_QUATERNION:
-        {
-        }
-        break;
+      // Quaternion data is NOT here
+//    case DeviceDataType::DDT_QUATERNION:
+//        break;
 
     default:
         break;
@@ -458,7 +548,7 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
 void gfListener::connectDevice(const QString &devName, const EMG_DATA_BITS emgDataBits, const EMG_DATA_RATE emgDataRate, const ACC_DATA_RATE accelDataRate, const GYRO_DATA_RATE gyroDataRate, const MAG_DATA_RATE magDataRate, const QUAT_DATA_RATE quatDataRate) {
     SPDEVICE device = nullptr;
 
-    qDebug() << "devName:" << devName << ", emgDataBits:" << emgDataBits << ", dataRate:" << emgDataRate;
+    qDebug() << "devName:" << devName << ", emgDataBits:" << emgDataBits << ", emgDataRate:" << emgDataRate;
     mEMGDataBits = emgDataBits;   // Save for later use
     mEMGDataRate = emgDataRate;
     mAccelDataRate = accelDataRate;
@@ -572,57 +662,59 @@ void gfListener::disconnectDevice() {
 //    }
 //}
 
-void gfListener::saveRawData(QString fileName)
+void gfListener::saveEMGRawData(QString fileName)
 {
-    qDebug("get folder name by qml signal: %s", fileName.toStdString().c_str());
+    qDebug("saveEMGRawData: '%s'", fileName.toStdString().c_str());
 
-    if (!fileName.isEmpty()) {
-        isRecordingRawData = true;
-        QString fileNameBin = fileName + ".bin";
-        g_file.open(fileNameBin.toStdString(), ios::binary | ios::app);
+    if (!fileName.isEmpty())
+    {
+        isRecordingEMGRawData = true;
+        g_EMGfile.open(fileName.toStdString(), ios::binary | ios::app);
 
-        if (g_file.is_open()) {
-            qDebug(" %s is opened ",fileNameBin.toStdString().c_str());
+        if (g_EMGfile.is_open())
+        {
+            qDebug("'%s' is opened.", fileName.toStdString().c_str());
         }
     }
 }
 
-void gfListener::finishSaveData()
+void gfListener::finishSaveEMGRawData()
 {
-    if (g_file.is_open()) {
-        g_file.close();
+    if (g_EMGfile.is_open()) {
+        g_EMGfile.close();
     }
 
-    isRecordingRawData = false;
-
-    if (g_quaternionFile.is_open()) {
-        g_quaternionFile.close();
-    }
-
-    isRecordingQuaternionData = false;
+    isRecordingEMGRawData = false;
 }
 
-void gfListener::saveQuaternionData(QString fileName)
+void gfListener::saveCombinedData(QString fileName)
 {
-    qDebug("get folder name by qml signal: %s", fileName.toStdString().c_str());
+    qDebug("saveCombinedData: '%s'", fileName.toStdString().c_str());
 
-    if (!fileName.isEmpty()) {
-        isRecordingQuaternionData = true;
-        QString fileNameTxt = fileName + ".txt";
-        g_quaternionFile.open(fileNameTxt.toStdString(), ios::app);
+    if (!fileName.isEmpty())
+    {
+        isRecordingCombinedData = true;
+        timestampOffset = QDateTime().toMSecsSinceEpoch();
+        g_combinedFile.open(fileName.toStdString(), ios::app);
 
-        if (g_quaternionFile.is_open()) {
-            qDebug(" %s is opened ",fileNameTxt.toStdString().c_str());
+        if (g_combinedFile.is_open())
+        {
+            qDebug("'%s' is opened.", fileName.toStdString().c_str());
+
+            g_combinedFile << "{\n  \"data\": [\n";
         }
     }
 }
 
-void gfListener::finishSaveQuaternionData()
+void gfListener::finishSaveCombinedData()
 {
-    isRecordingQuaternionData = false;
+    isRecordingCombinedData = false;
 
-    if (g_quaternionFile.is_open()) {
-        g_quaternionFile.close();
+    if (g_combinedFile.is_open()) {
+
+        g_combinedFile << "  ]\n}\n";
+
+        g_combinedFile.close();
     }
 }
 
