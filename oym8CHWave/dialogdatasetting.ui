@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>398</width>
-    <height>263</height>
+    <width>910</width>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>220</y>
-     <width>231</width>
+     <x>680</x>
+     <y>450</y>
+     <width>201</width>
      <height>32</height>
     </rect>
    </property>
@@ -29,157 +29,368 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_DataBits">
+  <widget class="QGroupBox" name="groupBox_EMG">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>361</width>
-     <height>61</height>
+     <x>470</x>
+     <y>171</y>
+     <width>411</width>
+     <height>221</height>
     </rect>
    </property>
    <property name="title">
-    <string>Data Bits</string>
+    <string>EMG</string>
    </property>
-   <widget class="QRadioButton" name="radioButton_12bit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QGroupBox" name="groupBox_DataRate">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>30</y>
-      <width>91</width>
-      <height>16</height>
+      <x>20</x>
+      <y>110</y>
+      <width>371</width>
+      <height>91</height>
      </rect>
     </property>
-    <property name="text">
-     <string>12bits</string>
+    <property name="title">
+     <string>Data Rate</string>
     </property>
+    <widget class="QRadioButton" name="radioButton_650Hz">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>60</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>650Hz</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_500Hz">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>60</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>500Hz</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_250Hz">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>30</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>250Hz</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_100Hz">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>100Hz</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_200Hz">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>30</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>200Hz</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_400Hz">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>400Hz</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_1000Hz">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>60</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1000Hz</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QRadioButton" name="radioButton_8bit">
+   <widget class="QGroupBox" name="groupBox_DataBits">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>20</x>
       <y>30</y>
-      <width>91</width>
-      <height>16</height>
+      <width>371</width>
+      <height>61</height>
      </rect>
     </property>
-    <property name="text">
-     <string>8bits</string>
+    <property name="title">
+     <string>Data Bits</string>
     </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
+    <widget class="QRadioButton" name="radioButton_12bit">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>30</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>12bits</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton_8bit">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>8bits</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_DataRate">
+  <widget class="QGroupBox" name="groupBox_Gyro">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>110</y>
-     <width>361</width>
-     <height>91</height>
+     <x>30</x>
+     <y>170</y>
+     <width>411</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="title">
-    <string>Data Rate</string>
+    <string>Gyro</string>
    </property>
-   <widget class="QRadioButton" name="radioButton_650Hz">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QGroupBox" name="groupBox_GyroDataRate">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>60</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>650Hz</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_500Hz">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>60</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>500Hz</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_250Hz">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
+      <x>20</x>
       <y>30</y>
-      <width>71</width>
-      <height>16</height>
+      <width>371</width>
+      <height>61</height>
      </rect>
     </property>
-    <property name="text">
-     <string>250Hz</string>
+    <property name="title">
+     <string>Data Rate</string>
     </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_100Hz">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>100Hz</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_200Hz">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>30</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>200Hz</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_400Hz">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>400Hz</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="radioButton_1000Hz">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>60</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>1000Hz</string>
-    </property>
+    <widget class="QRadioButton" name="radioButton_Gyro100HZ">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>100HZ</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
+  <widget class="QGroupBox" name="groupBox_Accel">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>30</y>
+     <width>411</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Accel</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QGroupBox" name="groupBox_AccelDataRate">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>371</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Data Rate</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_Accel100HZ">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>100HZ</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_Magnetic">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>310</y>
+     <width>411</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Magnetic</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QGroupBox" name="groupBox_MagneticDataRate">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>371</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Data Rate</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_Magnetic10HZ">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>10HZ</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_Quaternion">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>30</y>
+     <width>411</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Quaternion</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <widget class="QGroupBox" name="groupBox_QuaternionDataRate">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>371</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Data Rate</string>
+    </property>
+    <widget class="QRadioButton" name="radioButton_Quaternion100HZ">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>91</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>100HZ</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <zorder>groupBox_Quaternion</zorder>
+  <zorder>groupBox_Magnetic</zorder>
+  <zorder>groupBox_EMG</zorder>
+  <zorder>buttonBox</zorder>
+  <zorder>groupBox_Gyro</zorder>
+  <zorder>groupBox_Accel</zorder>
  </widget>
  <tabstops>
+  <tabstop>groupBox_Accel</tabstop>
+  <tabstop>radioButton_Accel100HZ</tabstop>
+  <tabstop>groupBox_Gyro</tabstop>
+  <tabstop>radioButton_Gyro100HZ</tabstop>
+  <tabstop>groupBox_Magnetic</tabstop>
+  <tabstop>radioButton_Magnetic10HZ</tabstop>
+  <tabstop>groupBox_Quaternion</tabstop>
+  <tabstop>radioButton_Quaternion100HZ</tabstop>
+  <tabstop>groupBox_EMG</tabstop>
   <tabstop>radioButton_8bit</tabstop>
   <tabstop>radioButton_12bit</tabstop>
   <tabstop>radioButton_100Hz</tabstop>

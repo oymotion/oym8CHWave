@@ -78,8 +78,8 @@ private:
 
 
 gfListener::gfListener(std::shared_ptr<Hub> hub, QObject *parent) :QObject(parent),
-    isSaveRawData(false),
-    isSaveQuaternionData(false),
+    isRecordingRawData(false),
+    isRecordingQuaternionData(false),
     mDevice(nullptr)
 {
     gfThread = std::make_shared<GfThread>(hub);
@@ -162,45 +162,77 @@ void gfListener::onDeviceConnected(SPDEVICE device)
 
         if (nullptr != setting)
         {
+            // DeviceSetting::DataNotifFlags flags;
+            // flags = (DeviceSetting::DataNotifFlags)
+            //         (DeviceSetting::DNF_OFF
+            //          //| DeviceSetting::DNF_ACCELERATE
+            //          //| DeviceSetting::DNF_GYROSCOPE
+            //          //| DeviceSetting::DNF_MAGNETOMETER
+            //          //| DeviceSetting::DNF_EULERANGLE
+            //          //| DeviceSetting::DNF_QUATERNION
+            //          //| DeviceSetting::DNF_ROTATIONMATRIX
+            //          //| DeviceSetting::DNF_EMG_GESTURE
+            //          //| DeviceSetting::DNF_EMG_RAW
+            //          //| DeviceSetting::DNF_HID_MOUSE
+            //          //| DeviceSetting::DNF_HID_JOYSTICK
+            //          //| DeviceSetting::DNF_DEVICE_STATUS
+            //          );
+
+            unsigned int flags = DeviceSetting::DNF_OFF;
+
+            if (listener->mEMGDataRate != EMG_DATA_RATE::EMG_DATA_RATE_DISABLED)
+                flags |= DeviceSetting::DNF_EMG_RAW;
+
+            if (listener->mAccelDataRate != ACC_DATA_RATE::ACC_DATA_RATE_DISABLED)
+                flags |= DeviceSetting::DNF_ACCELERATE;
+
+            if (listener->mGyroDataRate != GYRO_DATA_RATE::GYRO_DATA_RATE_DISABLED)
+                flags |= DeviceSetting::DNF_GYROSCOPE;
+
+            if (listener->mMagDataRate != MAG_DATA_RATE::MAG_DATA_RATE_DISABLED)
+                flags |= DeviceSetting::DNF_MAGNETOMETER;
+
+            if (listener->mQuatDataRate != QUAT_DATA_RATE::QUAT_DATA_RATE_DISABLED)
+                flags |= DeviceSetting::DNF_QUATERNION;
+
+
             setting->enableDataNotification(0);
 
-            setting->setEMGRawDataConfig(mDataRate,         //sample rate
-                                         (DeviceSetting::EMGRowDataChannels)(0x00FF),  //channel 0~7
-                                         128,               //data length
-                                         mDataBits,         // adc resolution
-                                         [listener, setting](ResponseResult result) {
-                string ret = (result == ResponseResult::RREST_SUCCESS) ? ("sucess") : ("failed");
-                qDebug() <<"setEMGRawDataConfig() returned:" << ret.c_str();
+            setting->setDataNotifSwitch((DeviceSetting::DataNotifFlags)flags, [listener, setting](ResponseResult result) {
+                qDebug() << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result);
 
                 if (result == ResponseResult::RREST_SUCCESS)
                 {
-                    DeviceSetting::DataNotifFlags flags;
-                    flags = (DeviceSetting::DataNotifFlags)
-                            (DeviceSetting::DNF_OFF
-                             //| DeviceSetting::DNF_ACCELERATE
-                             //| DeviceSetting::DNF_GYROSCOPE
-                             //| DeviceSetting::DNF_MAGNETOMETER
-                             //| DeviceSetting::DNF_EULERANGLE
-                             //| DeviceSetting::DNF_QUATERNION
-                             //| DeviceSetting::DNF_ROTATIONMATRIX
-                             //| DeviceSetting::DNF_EMG_GESTURE
-                             | DeviceSetting::DNF_EMG_RAW
-                             //| DeviceSetting::DNF_HID_MOUSE
-                             //| DeviceSetting::DNF_HID_JOYSTICK
-                             //| DeviceSetting::DNF_DEVICE_STATUS
-                             );
+                    if (listener->mEMGDataRate != EMG_DATA_RATE::EMG_DATA_RATE_DISABLED)
+                    {
+                        setting->setEMGRawDataConfig(listener->mEMGDataRate,         //sample rate
+                                                     (DeviceSetting::EMGRowDataChannels)(0x00FF),  //channel 0~7
+                                                     128,               //data length
+                                                     listener->mEMGDataBits,         // adc resolution
+                                                     [listener, setting](ResponseResult result) {
+                            string ret = (result == ResponseResult::RREST_SUCCESS) ? ("sucess") : ("failed");
+                            qDebug() <<"setEMGRawDataConfig() returned:" << ret.c_str();
 
-                    setting->setDataNotifSwitch(flags, [setting](ResponseResult result) {
-                        qDebug() << "setDataNotifSwitch() returned:" << static_cast<GF_UINT32>(result);
+                            if (result == ResponseResult::RREST_SUCCESS)
+                            {
+                                setting->enableDataNotification(1);
+                            }
+                            else
+                            {
+                                emit listener->emgSettingFailed();
+                            }
+                        });
+                    }
+                    else
+                    {
                         setting->enableDataNotification(1);
-                    });
+                    }
                 }
                 else
                 {
-                    emit listener->emgSettingFailed();
+                    // TODO: emit error signal
                 }
             });
-
         }
     }
 
@@ -253,7 +285,7 @@ void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
      emit sendQuaternion(array.toVariant());
 
      // save quaternion
-     if (isSaveQuaternionData) {
+     if (isRecordingQuaternionData) {
          //save quaternion data
          if (g_quaternionFile.is_open()) {
              g_quaternionFile << rotation.w();
@@ -362,7 +394,7 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
             {
                 QVector<uint8_t> tempRawData;
 
-                if (mDataBits == DATA_BITS_12)
+                if (mEMGDataBits == EMG_DATA_BITS_12)
                 {
                     for (size_t i = 0; i < data->size(); i += 2)
                     {
@@ -370,7 +402,7 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                         tempRawData.push_back(static_cast<uint8_t>((data->at(i) + (data->at(i + 1) << 8)) >> 4));
                     }
                 }
-                else if (mDataBits == DATA_BITS_8)
+                else if (mEMGDataBits == EMG_DATA_BITS_8)
                 {
                     for (size_t i = 0; i < data->size(); ++i)
                     {
@@ -386,7 +418,7 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
             }
 
             // save raw data
-            if (isSaveRawData)
+            if (isRecordingRawData)
             {
                 //save raw data with format
                 if (g_file.is_open())
@@ -394,6 +426,21 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                     g_file.write((const char*)data->data(), data->size());
                 }
             }
+        }
+        break;
+
+    case DeviceDataType::DDT_ACCELERATE:
+        {
+        }
+        break;
+
+    case DeviceDataType::DDT_GYROSCOPE:
+        {
+        }
+        break;
+
+    case DeviceDataType::DDT_MAGNETOMETER:
+        {
         }
         break;
 
@@ -408,12 +455,16 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
 }
 
 
-void gfListener::connectDevice(const QString &devName, const DATA_BITS dataBits, const DATA_RATE dataRate) {
+void gfListener::connectDevice(const QString &devName, const EMG_DATA_BITS emgDataBits, const EMG_DATA_RATE emgDataRate, const ACC_DATA_RATE accelDataRate, const GYRO_DATA_RATE gyroDataRate, const MAG_DATA_RATE magDataRate, const QUAT_DATA_RATE quatDataRate) {
     SPDEVICE device = nullptr;
 
-    qDebug() << "devName:" << devName << ", dataBits:" << dataBits << ", dataRate:" << dataRate;
-    mDataBits = dataBits;   // Save for later use
-    mDataRate = dataRate;
+    qDebug() << "devName:" << devName << ", emgDataBits:" << emgDataBits << ", dataRate:" << emgDataRate;
+    mEMGDataBits = emgDataBits;   // Save for later use
+    mEMGDataRate = emgDataRate;
+    mAccelDataRate = accelDataRate;
+    mGyroDataRate = gyroDataRate;
+    mMagDataRate = magDataRate;
+    mQuatDataRate = quatDataRate;
 
     for (auto dev : mFoundDevices)
     {
@@ -526,7 +577,7 @@ void gfListener::saveRawData(QString fileName)
     qDebug("get folder name by qml signal: %s", fileName.toStdString().c_str());
 
     if (!fileName.isEmpty()) {
-        isSaveRawData = true;
+        isRecordingRawData = true;
         QString fileNameBin = fileName + ".bin";
         g_file.open(fileNameBin.toStdString(), ios::binary | ios::app);
 
@@ -538,10 +589,17 @@ void gfListener::saveRawData(QString fileName)
 
 void gfListener::finishSaveData()
 {
-    isSaveRawData = false;
     if (g_file.is_open()) {
         g_file.close();
     }
+
+    isRecordingRawData = false;
+
+    if (g_quaternionFile.is_open()) {
+        g_quaternionFile.close();
+    }
+
+    isRecordingQuaternionData = false;
 }
 
 void gfListener::saveQuaternionData(QString fileName)
@@ -549,7 +607,7 @@ void gfListener::saveQuaternionData(QString fileName)
     qDebug("get folder name by qml signal: %s", fileName.toStdString().c_str());
 
     if (!fileName.isEmpty()) {
-        isSaveQuaternionData = true;
+        isRecordingQuaternionData = true;
         QString fileNameTxt = fileName + ".txt";
         g_quaternionFile.open(fileNameTxt.toStdString(), ios::app);
 
@@ -561,7 +619,7 @@ void gfListener::saveQuaternionData(QString fileName)
 
 void gfListener::finishSaveQuaternionData()
 {
-    isSaveQuaternionData = false;
+    isRecordingQuaternionData = false;
 
     if (g_quaternionFile.is_open()) {
         g_quaternionFile.close();

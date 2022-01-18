@@ -71,7 +71,8 @@ private:
   const int SHOW_MESSAGE_TIME = 5000;
 
   bool deviceConnected;
-  QString recordingFileName;
+  QString recordingEMGFileName;
+  QString recordingQuatFileName;
 
   QCustomPlot *plots[CHNUM];
 

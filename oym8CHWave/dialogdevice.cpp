@@ -50,7 +50,12 @@ int DialogDevice::exec()
 
         if (dlgDataSetting.exec() == QDialog::Accepted)
         {
-            listener->connectDevice(getSelectedDevice(), dlgDataSetting.getDataBits(), dlgDataSetting.getDataRate());
+            listener->connectDevice(getSelectedDevice(),
+                                    dlgDataSetting.getEMGDataBits(), dlgDataSetting.getEMGDataRate(),
+                                    dlgDataSetting.getAccelDataRate(),
+                                    dlgDataSetting.getGyroDataRate(),
+                                    dlgDataSetting.getMagneticDataRate(),
+                                    dlgDataSetting.getQuatDataRate());
         }
     }
 

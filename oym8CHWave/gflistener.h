@@ -57,8 +57,51 @@ signals:
     void emgSettingFailed();
 
 public:
-    enum DATA_BITS {DATA_BITS_8 = 8, DATA_BITS_12 = 12};
-    enum DATA_RATE {DATA_RATE_100 = 100, DATA_RATE_200 = 200, DATA_RATE_250 = 250, DATA_RATE_400 = 400, DATA_RATE_500 = 500, DATA_RATE_650 = 650, DATA_RATE_1000=1000};
+    enum EMG_DATA_BITS {
+        EMG_DATA_BITS_8 = 8,
+        EMG_DATA_BITS_12 = 12
+    };
+
+    enum EMG_DATA_RATE {
+        EMG_DATA_RATE_DISABLED = 0,
+        EMG_DATA_RATE_100 = 100,
+        EMG_DATA_RATE_200 = 200,
+        EMG_DATA_RATE_250 = 250,
+        EMG_DATA_RATE_400 = 400,
+        EMG_DATA_RATE_500 = 500,
+        EMG_DATA_RATE_650 = 650,
+        EMG_DATA_RATE_1000=1000
+    };
+
+    enum ACC_DATA_RATE {
+        ACC_DATA_RATE_DISABLED = 0,
+        ACC_DATA_RATE_50 = 50,
+        ACC_DATA_RATE_100 = 100,
+        ACC_DATA_RATE_200 = 200
+    };
+
+    enum GYRO_DATA_RATE {
+        GYRO_DATA_RATE_DISABLED = 0,
+        GYRO_DATA_RATE_50 = 50,
+        GYRO_DATA_RATE_100 = 100,
+        GYRO_DATA_RATE_200 = 200
+    };
+
+    enum MAG_DATA_RATE {
+        MAG_DATA_RATE_DISABLED = 0,
+        MAG_DATA_RATE_5 = 5,
+        MAG_DATA_RATE_10 = 10,
+        MAG_DATA_RATE_25 = 25,
+        MAG_DATA_RATE_50 = 50
+    };
+
+    enum QUAT_DATA_RATE {
+        QUAT_DATA_RATE_DISABLED = 0,
+        QUAT_DATA_RATE_50 = 50,
+        QUAT_DATA_RATE_100 = 100,
+        QUAT_DATA_RATE_200 = 200
+    };
+
 
     Q_INVOKABLE void saveRawData(QString fileName);
     Q_INVOKABLE void finishSaveData();
@@ -68,11 +111,16 @@ public:
     Q_INVOKABLE void finishSaveQuaternionData();
     Q_INVOKABLE bool getDeviceStatus();
     //
-    Q_INVOKABLE void connectDevice(const QString &devName, const DATA_BITS dataBits=DATA_BITS_8, const DATA_RATE dataRate=DATA_RATE_500);
+    Q_INVOKABLE void connectDevice(const QString &devName, const EMG_DATA_BITS emgDataBits, const EMG_DATA_RATE emgDataRate, const ACC_DATA_RATE accelDataRate, const GYRO_DATA_RATE gyroDataRate, const MAG_DATA_RATE magDataRate, const QUAT_DATA_RATE quatDataRate);
     Q_INVOKABLE void disconnectDevice();
 
-    DATA_BITS getDataBits() {return mDataBits;}
-    DATA_RATE getDataRate() {return mDataRate;}
+    EMG_DATA_BITS getEMGDataBits() {return mEMGDataBits;}
+    EMG_DATA_RATE getEMGDataRate() {return mEMGDataRate;}
+
+    ACC_DATA_RATE getAccDataRate() {return mAccelDataRate;}
+    GYRO_DATA_RATE getGyroDataRate() {return mGyroDataRate;}
+    MAG_DATA_RATE getMagDataRate() {return mMagDataRate;}
+    QUAT_DATA_RATE getQuatDataRate() {return mQuatDataRate;}
 
 private:
     QString fullDevName(SPDEVICE device);
@@ -86,11 +134,16 @@ private:
 
     bool mDConnectStatus = false;
 
-    DATA_BITS mDataBits;
-    DATA_RATE mDataRate;
+    EMG_DATA_BITS mEMGDataBits;
+    EMG_DATA_RATE mEMGDataRate;
 
-    bool isSaveRawData;
-    bool isSaveQuaternionData;
+    ACC_DATA_RATE mAccelDataRate;
+    GYRO_DATA_RATE mGyroDataRate;
+    MAG_DATA_RATE mMagDataRate;
+    QUAT_DATA_RATE mQuatDataRate;
+
+    bool isRecordingRawData;
+    bool isRecordingQuaternionData;
     // file, object
     ofstream g_file;
     ofstream g_quaternionFile;

@@ -18,8 +18,14 @@ public:
     explicit DialogDataSetting(QWidget *parent = nullptr);
     ~DialogDataSetting();
 
-    gfListener::DATA_BITS getDataBits();
-    gfListener::DATA_RATE getDataRate();
+    gfListener::EMG_DATA_BITS getEMGDataBits();
+    gfListener::EMG_DATA_RATE getEMGDataRate();
+
+    gfListener::ACC_DATA_RATE getAccelDataRate();
+    gfListener::GYRO_DATA_RATE getGyroDataRate();
+    gfListener::MAG_DATA_RATE getMagneticDataRate();
+
+    gfListener::QUAT_DATA_RATE getQuatDataRate();
 
 private slots:
     void on_radioButton_12bit_clicked();

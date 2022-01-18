@@ -239,7 +239,7 @@ void MainWindow::handleDeviceDisconnected()
     QMessageBox::information(this, tr("Info"), tr("gForce disconnected."));
     ui->statusBar->showMessage(tr("gForce disconnected."));
 
-    if (recordingFileName.isEmpty())
+    if (recordingEMGFileName.isEmpty() && recordingQuatFileName.isEmpty())
     {
         // Not recording, can disable it now
         ui->pushButtonRecord->setEnabled(false);
@@ -337,7 +337,7 @@ uint8_t MainWindow::doFilter(int channelData, int CHNum)
 
 void MainWindow::on_pushButtonRecord_clicked()
 {
-    if (recordingFileName.isEmpty())
+    if (recordingEMGFileName.isEmpty() && recordingQuatFileName.isEmpty())
     {
         // Not recording, start
 
@@ -348,8 +348,17 @@ void MainWindow::on_pushButtonRecord_clicked()
             currentDir.mkdir("data");
         }
 
-        recordingFileName = (QString("data") + QDir::separator() + QString("EMG_%1_%2bits_%3Hz")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")).arg(gflistener->getDataBits()).arg(gflistener->getDataRate());
-        gflistener->saveRawData(recordingFileName);
+        if (gflistener->getEMGDataRate() != gfListener::EMG_DATA_RATE::EMG_DATA_RATE_DISABLED)
+        {
+            recordingEMGFileName = (QString("data") + QDir::separator() + QString("EMG_%1_%2bits_%3Hz")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")).arg(gflistener->getEMGDataBits()).arg(gflistener->getEMGDataRate());
+            gflistener->saveRawData(recordingEMGFileName);
+        }
+
+        if (gflistener->getQuatDataRate() != gfListener::QUAT_DATA_RATE::QUAT_DATA_RATE_DISABLED)
+        {
+            recordingQuatFileName = (QString("data") + QDir::separator() + QString("QUAT_%1_%2Hz")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")).arg(gflistener->getQuatDataRate());
+            gflistener->saveQuaternionData(recordingQuatFileName);
+        }
 
         ui->pushButtonRecord->setText(tr("Stop Recording"));
     }
@@ -357,25 +366,51 @@ void MainWindow::on_pushButtonRecord_clicked()
     {
         // Recording, stop
         gflistener->finishSaveData();
-        gflistener->saveRawData("");
+        // gflistener->saveRawData("");
+        // gflistener->saveQuaternionData("");
 
-        // qDebug() << recordingFileName << "saved.";
-        if (QMessageBox::question(this, tr("File Saved"), tr("File '%1.bin' saved.\nSave to another place?").arg(recordingFileName), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+        if (!recordingEMGFileName.isEmpty())
         {
-            QString newFilename = QFileDialog::getSaveFileName(this, tr("Save as"), ".", "Binary file (*.bin)");
-
-            if (newFilename.length() != 0)
+            // qDebug() << recordingEMGFileName << "saved.";
+            if (QMessageBox::question(this, tr("File Saved"), tr("File '%1.bin' saved.\nSave to another place?").arg(recordingEMGFileName), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
             {
-                bool renamed = QFile::rename(recordingFileName + ".bin", newFilename);
+                QString newFilename = QFileDialog::getSaveFileName(this, tr("Save as"), ".", "Binary file (*.bin)");
 
-                if (renamed)
+                if (newFilename.length() != 0)
                 {
-                    QMessageBox::information(this, tr("File renamed"), tr("File '%1.bin' renamed to '%2'").arg(recordingFileName).arg(newFilename));
+                    bool renamed = QFile::rename(recordingEMGFileName + ".bin", newFilename);
+
+                    if (renamed)
+                    {
+                        QMessageBox::information(this, tr("File renamed"), tr("File '%1.bin' renamed to '%2'").arg(recordingEMGFileName).arg(newFilename));
+                    }
                 }
             }
+
+            recordingEMGFileName.clear();
         }
 
-        recordingFileName.clear();
+
+        if (!recordingQuatFileName.isEmpty())
+        {
+            // qDebug() << recordingQuatFileName << "saved.";
+            if (QMessageBox::question(this, tr("File Saved"), tr("File '%1.txt' saved.\nSave to another place?").arg(recordingQuatFileName), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+            {
+                QString newFilename = QFileDialog::getSaveFileName(this, tr("Save as"), ".", "Text file (*.txt)");
+
+                if (newFilename.length() != 0)
+                {
+                    bool renamed = QFile::rename(recordingQuatFileName + ".txt", newFilename);
+
+                    if (renamed)
+                    {
+                        QMessageBox::information(this, tr("File renamed"), tr("File '%1.txt' renamed to '%2'").arg(recordingQuatFileName).arg(newFilename));
+                    }
+                }
+            }
+
+            recordingQuatFileName.clear();
+        }
 
         ui->pushButtonRecord->setText(tr("Start Recording"));
         ui->pushButtonRecord->setEnabled(deviceConnected);

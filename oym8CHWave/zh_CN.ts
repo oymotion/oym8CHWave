@@ -32,59 +32,100 @@
         <translation>数据格式设置</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="42"/>
+        <location filename="dialogdatasetting.ui" line="164"/>
         <source>Data Bits</source>
         <translation>数据位数</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="54"/>
+        <location filename="dialogdatasetting.ui" line="176"/>
         <source>12bits</source>
         <translation>12位</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="67"/>
+        <location filename="dialogdatasetting.ui" line="189"/>
         <source>8bits</source>
         <translation>8位</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="84"/>
+        <location filename="dialogdatasetting.ui" line="57"/>
+        <location filename="dialogdatasetting.ui" line="222"/>
+        <location filename="dialogdatasetting.ui" line="267"/>
+        <location filename="dialogdatasetting.ui" line="312"/>
+        <location filename="dialogdatasetting.ui" line="357"/>
         <source>Data Rate</source>
         <translation>采样率</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="96"/>
+        <location filename="dialogdatasetting.ui" line="42"/>
+        <source>EMG</source>
+        <translation>EMG</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="69"/>
         <source>650Hz</source>
         <translation>650赫兹</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="109"/>
+        <location filename="dialogdatasetting.ui" line="82"/>
         <source>500Hz</source>
         <translation>500赫兹</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="125"/>
+        <location filename="dialogdatasetting.ui" line="98"/>
         <source>250Hz</source>
         <translation>250赫兹</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="138"/>
+        <location filename="dialogdatasetting.ui" line="111"/>
         <source>100Hz</source>
         <translation>100赫兹</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="151"/>
+        <location filename="dialogdatasetting.ui" line="124"/>
         <source>200Hz</source>
         <translation>200赫兹</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="164"/>
+        <location filename="dialogdatasetting.ui" line="137"/>
         <source>400Hz</source>
         <translation>400赫兹</translation>
     </message>
     <message>
-        <location filename="dialogdatasetting.ui" line="177"/>
+        <location filename="dialogdatasetting.ui" line="150"/>
         <source>1000Hz</source>
         <translation>1000赫兹</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="207"/>
+        <source>Gyro</source>
+        <translation>陀螺仪</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="234"/>
+        <location filename="dialogdatasetting.ui" line="279"/>
+        <location filename="dialogdatasetting.ui" line="369"/>
+        <source>100HZ</source>
+        <translation>100赫兹</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="252"/>
+        <source>Accel</source>
+        <translation>加速度计</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="297"/>
+        <source>Magnetic</source>
+        <translation>磁场计</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="324"/>
+        <source>10HZ</source>
+        <translation>10赫兹</translation>
+    </message>
+    <message>
+        <location filename="dialogdatasetting.ui" line="342"/>
+        <source>Quaternion</source>
+        <translation>四元数</translation>
     </message>
 </context>
 <context>
@@ -110,7 +151,7 @@
     <message>
         <location filename="mainwindow.ui" line="28"/>
         <location filename="mainwindow.cpp" line="75"/>
-        <location filename="mainwindow.cpp" line="380"/>
+        <location filename="mainwindow.cpp" line="415"/>
         <source>Start Recording</source>
         <translation>记录到文件</translation>
     </message>
@@ -233,36 +274,51 @@ Please disconnect then connect again.</source>
         <translation>连接声效播放器</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="354"/>
+        <location filename="mainwindow.cpp" line="363"/>
         <source>Stop Recording</source>
         <translation>停止记录数据</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="363"/>
+        <location filename="mainwindow.cpp" line="375"/>
+        <location filename="mainwindow.cpp" line="397"/>
         <source>File Saved</source>
         <translation>文件已保存</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="363"/>
+        <location filename="mainwindow.cpp" line="375"/>
         <source>File &apos;%1.bin&apos; saved.
 Save to another place?</source>
         <translation>文件 &apos;%1.bin&apos; 已保存。
 要另存到其它位置么？</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="365"/>
+        <location filename="mainwindow.cpp" line="377"/>
+        <location filename="mainwindow.cpp" line="399"/>
         <source>Save as</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="373"/>
+        <location filename="mainwindow.cpp" line="385"/>
+        <location filename="mainwindow.cpp" line="407"/>
         <source>File renamed</source>
         <translation>文件已另存</translation>
     </message>
     <message>
-        <location filename="mainwindow.cpp" line="373"/>
+        <location filename="mainwindow.cpp" line="385"/>
         <source>File &apos;%1.bin&apos; renamed to &apos;%2&apos;</source>
         <translation>文件 &apos;%1.bin&apos; 已另存为 &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="397"/>
+        <source>File &apos;%1.txt&apos; saved.
+Save to another place?</source>
+        <translation>文件“%1.txt”已保存，
+是否需要另存到其它位置？</translation>
+    </message>
+    <message>
+        <location filename="mainwindow.cpp" line="407"/>
+        <source>File &apos;%1.txt&apos; renamed to &apos;%2&apos;</source>
+        <translation>文件“%1.txt”已经被另存为“%2”</translation>
     </message>
 </context>
 </TS>
