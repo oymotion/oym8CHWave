@@ -28,17 +28,19 @@ INCLUDEPATH += qcustomplot
 SOURCES += \
     dialogdatasetting.cpp \
     dialogdevice.cpp \
+    gfhubthread.cpp \
     gflistener.cpp \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     qcustomplot/qcustomplot.cpp \
     dialogconnect.cpp
 
 HEADERS += \
     dialogdatasetting.h \
     dialogdevice.h \
+    gfhubthread.h \
     gflistener.h \
-        mainwindow.h \
+    mainwindow.h \
     qcustomplot/qcustomplot.h \
     dialogconnect.h \
     third_party/gforce/inc/gforce.h \
@@ -47,7 +49,7 @@ HEADERS += \
 FORMS += \
     dialogdatasetting.ui \
     dialogdevice.ui \
-        mainwindow.ui \
+    mainwindow.ui \
     dialogconnect.ui
 
 

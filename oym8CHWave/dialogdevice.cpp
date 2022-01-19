@@ -7,7 +7,7 @@
 
 
 
-DialogDevice::DialogDevice(std::shared_ptr<gf::Hub> &hub, std::shared_ptr<gfListener> &listener, QWidget *parent) :
+DialogDevice::DialogDevice(std::shared_ptr<gf::Hub> &hub, std::shared_ptr<GFListener> &listener, QWidget *parent) :
     QDialog(parent),
     listener(listener),
     hub(hub),

@@ -217,7 +217,7 @@
      <x>0</x>
      <y>0</y>
      <width>1366</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -244,6 +244,9 @@
    </property>
   </action>
   <action name="actionConnectTogForce">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Connect To gForce</string>
    </property>

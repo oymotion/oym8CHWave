@@ -7,99 +7,25 @@
 #include "mainwindow.h"
 
 
-class GfThread : public QThread
-{
-public:
-    explicit GfThread(std::shared_ptr<gf::Hub> hub, QObject *parent = nullptr) :
-        QThread(parent),
-        m_hub(hub)
-    {
 
-    }
-
-    ~GfThread()
-    {
-        // request thread stop
-        requestInterruption();
-        quit();
-        wait();
-    }
-
-
-protected:
-    void run()
-    {
-        GF_RET_CODE retCode = GF_RET_CODE::GF_SUCCESS;
-
-        /**
-         * Initialize hub. Could be failed in below cases:
-         * 1.The hub is not plugged in the USB port.
-         * 2.Other apps are connected to the hub already.
-        **/
-        while ((retCode = m_hub->init()) != GF_RET_CODE::GF_SUCCESS)
-        {
-            cout << "hub init failed: " << static_cast<GF_UINT32>(retCode) << endl;
-
-            if (isInterruptionRequested())
-                return;
-
-            QThread::sleep(1);
-        }
-
-        cout << "hub init succeed: " << static_cast<GF_UINT32>(retCode) << endl;
-
-        while (!isInterruptionRequested()){
-            /// set up 50ms timeout so we can handle console commands; 50ms
-            GF_UINT32 period = 50;
-
-            /**
-             * Hub::run could be failed in the below cases:
-             * 1.other threads have already been launching it.
-             * 2.WorkMode is not set to WorkMode::Polling.
-            **/
-            /// A return of GF_RET_CODE::GF_ERROR_TIMEOUT means no error but period expired.
-            retCode = m_hub->run(period);
-
-            if (GF_RET_CODE::GF_SUCCESS != retCode &&
-                    GF_RET_CODE::GF_ERROR_TIMEOUT != retCode)
-            {
-                cout << "Method run() failed: " << static_cast<GF_UINT32>(retCode) << endl;
-                break;
-            }
-        }
-    }
-
-
-private:
-   // std::shared_ptr<gfListener> m_listenerPtr;
-    std::shared_ptr<gf::Hub> m_hub;
-};
-
-
-
-gfListener::gfListener(std::shared_ptr<Hub> hub, QObject *parent) :QObject(parent),
+GFListener::GFListener(std::shared_ptr<Hub> hub, QObject *parent) :QObject(parent),
     isRecordingEMGRawData(false),
     isRecordingCombinedData(false),
     mDevice(nullptr)
 {
-    gfThread = std::make_shared<GfThread>(hub);
-    gfThread->start();
+
 }
 
 
-gfListener::~gfListener()
+GFListener::~GFListener()
 {
-    qDebug("~gfListener()");
+    qDebug("~gfListener() called.");
     finishSaveEMGRawData();
     finishSaveCombinedData();
-
-    gfThread->requestInterruption();
-    gfThread->quit();
-    gfThread->wait();
 }
 
 
-QString gfListener::fullDevName(SPDEVICE device)
+QString GFListener::fullDevName(SPDEVICE device)
 {
     QString fullName = QString::fromStdWString(device->getName());
 
@@ -120,14 +46,14 @@ QString gfListener::fullDevName(SPDEVICE device)
 
 
 /// This callback is called when the Hub finishes scanning devices.
-void gfListener::onScanFinished()
+void GFListener::onScanFinished()
 {
     cout << __FUNCTION__ << " has been called." << endl;
     emit scanFinished();
 }
 
 /// This callback is called when the state of the hub changed
-void gfListener::onStateChanged(HubState state)
+void GFListener::onStateChanged(HubState state)
 {
     cout << __FUNCTION__ << " has been called. New state is " << static_cast<GF_UINT32>(state) << endl;
 
@@ -139,7 +65,7 @@ void gfListener::onStateChanged(HubState state)
 }
 
 /// This callback is called when the hub finds a device.
-void gfListener::onDeviceFound(SPDEVICE device)
+void GFListener::onDeviceFound(SPDEVICE device)
 {
     cout << __FUNCTION__ << " has been called." << endl;
 
@@ -150,7 +76,7 @@ void gfListener::onDeviceFound(SPDEVICE device)
 }
 
 /// This callback is called a device has been connected successfully
-void gfListener::onDeviceConnected(SPDEVICE device)
+void GFListener::onDeviceConnected(SPDEVICE device)
 {
     cout << __FUNCTION__ << " has been called." << endl;
 
@@ -244,7 +170,7 @@ void gfListener::onDeviceConnected(SPDEVICE device)
 }
 
 /// This callback is called when a device has been disconnected from connection state or failed to connect to
-void gfListener::onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason)
+void GFListener::onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason)
 {
     // if connection lost, we will try to reconnect again.
     cout << __FUNCTION__ << " has been called. reason: " << static_cast<GF_UINT32>(reason) << endl;
@@ -260,7 +186,7 @@ void gfListener::onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason)
 }
 
 /// This callback is called when the quaternion data is received
-void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
+void GFListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
 {
     Q_UNUSED(device)
 
@@ -291,15 +217,15 @@ void gfListener::onOrientationData(SPDEVICE device, const Quaternion& rotation)
          if (g_combinedFile.is_open())
          {
              // Save quaternion data
-             g_combinedFile << QString::asprintf("    {\"timestamp\" : %ul, \"type\" : \"%s\", \"data\" : [%f, %f, %f, %f]}\n",
-                                                 QDateTime().currentMSecsSinceEpoch() - timestampOffset,
-                                                 "QUAT", rotation.w(), rotation.x(), rotation.y(), rotation.z()).toStdString();
+             g_combinedFile << QString::asprintf("    {\"timestamp\" : %ul, \"QUAT\" : [%f, %f, %f, %f]}\n",
+                                                 QDateTime::currentMSecsSinceEpoch() - timestampOffset,
+                                                 rotation.w(), rotation.x(), rotation.y(), rotation.z()).toStdString();
          }
      }
 }
 
 /// This callback is called when the gesture data is recevied
-void gfListener::onGestureData(SPDEVICE device, Gesture gest)
+void GFListener::onGestureData(SPDEVICE device, Gesture gest)
 {
     Q_UNUSED(device)
 
@@ -342,7 +268,7 @@ void gfListener::onGestureData(SPDEVICE device, Gesture gest)
 }
 
 /// This callback is called when the button on gForce is pressed by user
-void gfListener::onDeviceStatusChanged(SPDEVICE device, DeviceStatus status)
+void GFListener::onDeviceStatusChanged(SPDEVICE device, DeviceStatus status)
 {
     Q_UNUSED(device)
 
@@ -374,7 +300,7 @@ void gfListener::onDeviceStatusChanged(SPDEVICE device, DeviceStatus status)
     cout << __FUNCTION__ << " has been called. " << devicestatus << endl;
 }
 
-void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, gfsPtr<const std::vector<GF_UINT8>> data)
+void GFListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, gfsPtr<const std::vector<GF_UINT8>> data)
 {
     Q_UNUSED(device)
 
@@ -432,23 +358,23 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                         for (size_t i = 0; i < data->size(); i += 2)
                         {
                             // Pack 12bit
-                            arrayString.append(QString::asprintf("0X04%X, ", data->at(i) + (data->at(i + 1) << 8)));
+                            arrayString.append(QString::asprintf("%d, ", data->at(i) + (data->at(i + 1) << 8)));
                         }
                     }
                     else if (mEMGDataBits == EMG_DATA_BITS_8)
                     {
                         for (size_t i = 0; i < data->size(); ++i)
                         {
-                            arrayString.append(QString::asprintf("0X02%X, ", data->at(i)));
+                            arrayString.append(QString::asprintf("%d, ", data->at(i)));
                         }
                     }
 
                     arrayString.chop(2);
                     arrayString.append("]");
 
-                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
-                                   << ", \"type\" : \"EMG\", \"data\" : " << arrayString.toStdString()
-                                   << "}\n";
+                    g_combinedFile << "\n    {\"timestamp\" : " << QDateTime::currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"EMG\" : " << arrayString.toStdString()
+                                   << "},";
                 }
             }
         }
@@ -473,9 +399,11 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                     arrayString.chop(2);
                     arrayString.append("]");
 
-                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
-                                   << ", \"type\" : \"ACC\", \"data\" : " << arrayString.toStdString()
-                                   << "}\n";
+                    // qDebug() << QDateTime::currentMSecsSinceEpoch() << timestampOffset << QDateTime::currentMSecsSinceEpoch() - timestampOffset;
+
+                    g_combinedFile << "\n    {\"timestamp\" : " << QDateTime::currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"ACC\" : " << arrayString.toStdString()
+                                   << "},";
                 }
             }
         }
@@ -500,9 +428,9 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                     arrayString.chop(2);
                     arrayString.append("]");
 
-                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
-                                   << ", \"type\" : \"GYRO\", \"data\" : " << arrayString.toStdString()
-                                   << "}\n";
+                    g_combinedFile << "\n    {\"timestamp\" : " << QDateTime::currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"GYRO\" : " << arrayString.toStdString()
+                                   << "},";
                 }
             }
         }
@@ -527,9 +455,9 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
                     arrayString.chop(2);
                     arrayString.append("]");
 
-                    g_combinedFile << "    {\"timestamp\" : " << QDateTime().currentMSecsSinceEpoch() - timestampOffset
-                                   << ", \"type\" : \"MAG\", \"data\" : " << arrayString.toStdString()
-                                   << "}\n";
+                    g_combinedFile << "\n    {\"timestamp\" : " << QDateTime::currentMSecsSinceEpoch() - timestampOffset
+                                   << ", \"MAG\" : " << arrayString.toStdString()
+                                   << "},";
                 }
             }
         }
@@ -545,7 +473,7 @@ void gfListener::onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, 
 }
 
 
-void gfListener::connectDevice(const QString &devName, const EMG_DATA_BITS emgDataBits, const EMG_DATA_RATE emgDataRate, const ACC_DATA_RATE accelDataRate, const GYRO_DATA_RATE gyroDataRate, const MAG_DATA_RATE magDataRate, const QUAT_DATA_RATE quatDataRate) {
+void GFListener::connectDevice(const QString &devName, const EMG_DATA_BITS emgDataBits, const EMG_DATA_RATE emgDataRate, const ACC_DATA_RATE accelDataRate, const GYRO_DATA_RATE gyroDataRate, const MAG_DATA_RATE magDataRate, const QUAT_DATA_RATE quatDataRate) {
     SPDEVICE device = nullptr;
 
     qDebug() << "devName:" << devName << ", emgDataBits:" << emgDataBits << ", emgDataRate:" << emgDataRate;
@@ -580,7 +508,7 @@ void gfListener::connectDevice(const QString &devName, const EMG_DATA_BITS emgDa
 }
 
 // disconnect action: for qml btn;
-void gfListener::disconnectDevice() {
+void GFListener::disconnectDevice() {
     // If there already is a device connected, disconnect it.
     if (nullptr != mDevice) {  // mDevice must not be nullptr
         DeviceConnectionStatus status = mDevice->getConnectionStatus();
@@ -662,7 +590,7 @@ void gfListener::disconnectDevice() {
 //    }
 //}
 
-void gfListener::saveEMGRawData(QString fileName)
+void GFListener::saveEMGRawData(QString fileName)
 {
     qDebug("saveEMGRawData: '%s'", fileName.toStdString().c_str());
 
@@ -678,47 +606,56 @@ void gfListener::saveEMGRawData(QString fileName)
     }
 }
 
-void gfListener::finishSaveEMGRawData()
+void GFListener::finishSaveEMGRawData()
 {
-    if (g_EMGfile.is_open()) {
-        g_EMGfile.close();
-    }
+    if (isRecordingEMGRawData)
+    {
+        if (g_EMGfile.is_open())
+        {
+            g_EMGfile.close();
+        }
 
-    isRecordingEMGRawData = false;
+        isRecordingEMGRawData = false;
+    }
 }
 
-void gfListener::saveCombinedData(QString fileName)
+void GFListener::saveCombinedData(QString fileName)
 {
     qDebug("saveCombinedData: '%s'", fileName.toStdString().c_str());
 
     if (!fileName.isEmpty())
     {
         isRecordingCombinedData = true;
-        timestampOffset = QDateTime().toMSecsSinceEpoch();
-        g_combinedFile.open(fileName.toStdString(), ios::app);
+        timestampOffset = QDateTime::currentMSecsSinceEpoch();
+        g_combinedFile.open(fileName.toStdString());
 
         if (g_combinedFile.is_open())
         {
             qDebug("'%s' is opened.", fileName.toStdString().c_str());
 
-            g_combinedFile << "{\n  \"data\": [\n";
+            g_combinedFile << "{\n  \"data\": [";
         }
     }
 }
 
-void gfListener::finishSaveCombinedData()
+void GFListener::finishSaveCombinedData()
 {
-    isRecordingCombinedData = false;
+    if (isRecordingCombinedData)
+    {
+        if (g_combinedFile.is_open())
+        {
+            unsigned long pos = g_combinedFile.tellp();
+            g_combinedFile.seekp(pos - 1); // Remove trailing ","
+            qDebug() << "prev pos:" << pos << ", new pos:" << g_combinedFile.tellp();
+            g_combinedFile << "\n  ]\n}\n";
+            g_combinedFile.close();
+        }
 
-    if (g_combinedFile.is_open()) {
-
-        g_combinedFile << "  ]\n}\n";
-
-        g_combinedFile.close();
+        isRecordingCombinedData = false;
     }
 }
 
-bool gfListener::getDeviceStatus()
+bool GFListener::getDeviceStatus()
 {
     return mDConnectStatus;
 }

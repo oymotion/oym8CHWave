@@ -15,7 +15,7 @@ class DialogDevice : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogDevice(std::shared_ptr<gf::Hub> &hub, std::shared_ptr<gfListener> &listener, QWidget *parent = nullptr);
+    explicit DialogDevice(std::shared_ptr<gf::Hub> &hub, std::shared_ptr<GFListener> &listener, QWidget *parent = nullptr);
     ~DialogDevice();
 
     int exec();
@@ -31,7 +31,7 @@ private:
     Ui::DialogDevice *ui;
 
     std::shared_ptr<gf::Hub> hub;
-    std::shared_ptr<gfListener> listener;
+    std::shared_ptr<GFListener> listener;
 
     int scanTurnsLeft;
 };

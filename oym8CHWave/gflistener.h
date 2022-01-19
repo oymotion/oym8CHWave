@@ -25,13 +25,13 @@ using namespace std;
 *1.Create a class for inheriting HubListener class; then, can use virtual function;
 *2.The gfSdk implements HubListener,operates gForce device and receives data
 **/
-class gfListener : public QObject, public HubListener
+class GFListener : public QObject, public HubListener
 {
     Q_OBJECT
 
 public:
-    gfListener(std::shared_ptr<Hub> hub, QObject *parent = nullptr);
-    ~gfListener();
+    GFListener(std::shared_ptr<Hub> hub, QObject *parent = nullptr);
+    ~GFListener();
 
     // below is gforce sdk callback function
     virtual void onScanFinished();
@@ -127,8 +127,6 @@ public:
 private:
     QString fullDevName(SPDEVICE device);
 
-    std::shared_ptr<QThread> gfThread;
-
     // create a device to operate
     std::shared_ptr<Device> mDevice;
 
@@ -151,7 +149,7 @@ private:
     ofstream g_EMGfile;
     ofstream g_combinedFile;
 
-    uint32_t timestampOffset;
+    int64_t timestampOffset;
 };
 
 #endif // GFLISTENER_H

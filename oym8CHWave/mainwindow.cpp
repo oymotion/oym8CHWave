@@ -45,7 +45,6 @@
 #include "qcustomplot/qcustomplot.h"
 #include "dialogconnect.h"
 #include "dialogdevice.h"
-#include "gflistener.h"
 
 
 QT_USE_NAMESPACE
@@ -55,6 +54,7 @@ QT_USE_NAMESPACE
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
+  hubReady(false),
   deviceConnected(false)
 {
   ui->setupUi(this);
@@ -85,10 +85,15 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->statusBar->showMessage(tr("Waiting for gForce connection..."));
 
 
-
   mHub = HubManager::getHubInstance(_T("gForce"));
 
-  gflistener = std::make_shared<gfListener>(mHub, this);
+  gfHubThread = std::make_shared<GFHubThread>(mHub);
+  QObject::connect(gfHubThread.get(), SIGNAL(hubReady()),
+                   this, SLOT(handleHubReady()));
+  gfHubThread->start();
+
+
+  gflistener = std::make_shared<GFListener>(mHub, this);
 
   QObject::connect(gflistener.get(), SIGNAL(sendDeviceData(QVector<uint8_t>)),
                    this, SLOT(on_drawLine(QVector<uint8_t>)));
@@ -101,8 +106,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
   QObject::connect(gflistener.get(), SIGNAL(emgSettingFailed()),
                    this, SLOT(handleEmgSettingFailed()));
-
-  mHub->setWorkMode(WorkMode::Polling);
 
   GF_RET_CODE retCode = GF_RET_CODE::GF_SUCCESS;
   cout << __FUNCTION__ << " has been called." << endl;
@@ -121,10 +124,18 @@ MainWindow::~MainWindow()
 
   // release phub resource
   mHub->unRegisterListener(gflistener);
-  mHub->deinit();
 
   delete ui;
 }
+
+
+//void MainWindow::closeEvent(QCloseEvent * event)
+//{
+//    if (QMessageBox::information(this, tr("Info"), tr("Close?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+//        event->accept();
+//    else
+//        event->ignore();
+//}
 
 
 void MainWindow::ch_WindowInit()
@@ -222,6 +233,12 @@ void MainWindow::on_drawLine(QVector<uint8_t> rawData)
 }
 
 
+void MainWindow::handleHubReady()
+{
+  hubReady = true;
+}
+
+
 void MainWindow::handleDeviceConnected()
 {
   deviceConnected = true;
@@ -278,6 +295,12 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionConnectTogForce_triggered()
 {
+    if (!hubReady)
+    {
+        QMessageBox::question(this, tr("gForce Hub not ready"), tr("Did you plug in gForce dongle?"), QMessageBox::Ok);
+        return;
+    }
+
     if (gflistener->getDeviceStatus())
     {
         if (QMessageBox::question(this, tr("Disconnect?"), tr("gForce is connected, disconnected first?")) != QMessageBox::Yes)
@@ -348,14 +371,14 @@ void MainWindow::on_pushButtonRecord_clicked()
             currentDir.mkdir("data");
         }
 
-        if (gflistener->getAccDataRate() != gfListener::ACC_DATA_RATE::ACC_DATA_RATE_DISABLED ||
-            gflistener->getGyroDataRate() != gfListener::GYRO_DATA_RATE::GYRO_DATA_RATE_DISABLED ||
-            gflistener->getMagDataRate() != gfListener::MAG_DATA_RATE::MAG_DATA_RATE_DISABLED ||
-            gflistener->getQuatDataRate() != gfListener::QUAT_DATA_RATE::QUAT_DATA_RATE_DISABLED)
+        if (gflistener->getAccDataRate() != GFListener::ACC_DATA_RATE::ACC_DATA_RATE_DISABLED ||
+            gflistener->getGyroDataRate() != GFListener::GYRO_DATA_RATE::GYRO_DATA_RATE_DISABLED ||
+            gflistener->getMagDataRate() != GFListener::MAG_DATA_RATE::MAG_DATA_RATE_DISABLED ||
+            gflistener->getQuatDataRate() != GFListener::QUAT_DATA_RATE::QUAT_DATA_RATE_DISABLED)
         {
             // Save to combined file
 
-            recordingCombinedFileName = (QString("data") + QDir::separator() + QString("MULTI_%1.json")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
+            recordingCombinedFileName = (QString("data") + QDir::separator() + QString("combined_%1.json")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
             gflistener->saveCombinedData(recordingCombinedFileName);
         }
         else

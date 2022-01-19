@@ -10,7 +10,9 @@
 
 #include "CircleBuff.h"
 #include "qcustomplot/qcustomplot.h"
+
 #include "gflistener.h"
+#include "gfhubthread.h"
 
 
 namespace Ui {
@@ -24,6 +26,7 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
+//  virtual void closeEvent(QCloseEvent * event);
 
 private:
   void sendString(const QString& str);  // Use this to avoid race condition of serial port.
@@ -39,6 +42,7 @@ private slots:
 
   void handleReadyRead();
 
+  void handleHubReady();
   void handleDeviceConnected();
   void handleDeviceDisconnected();
   void handleEmgSettingFailed();
@@ -58,10 +62,11 @@ protected:
 private:
   Ui::MainWindow *ui;
 
-  // create a instance of hub.
-  std::shared_ptr<Hub> mHub;
+  bool hubReady;
+  std::shared_ptr<Hub> mHub;                // Create a instance of hub.
+  std::shared_ptr<GFHubThread> gfHubThread; // To tick Hub
 
-  std::shared_ptr<gfListener> gflistener;
+  std::shared_ptr<GFListener> gflistener;
 
   static const int CHNUM = 8;
   const int THRESHOLD_MIN = 4;

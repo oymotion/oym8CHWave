@@ -18,14 +18,14 @@ public:
     explicit DialogDataSetting(QWidget *parent = nullptr);
     ~DialogDataSetting();
 
-    gfListener::EMG_DATA_BITS getEMGDataBits();
-    gfListener::EMG_DATA_RATE getEMGDataRate();
+    GFListener::EMG_DATA_BITS getEMGDataBits();
+    GFListener::EMG_DATA_RATE getEMGDataRate();
 
-    gfListener::ACC_DATA_RATE getAccelDataRate();
-    gfListener::GYRO_DATA_RATE getGyroDataRate();
-    gfListener::MAG_DATA_RATE getMagneticDataRate();
+    GFListener::ACC_DATA_RATE getAccelDataRate();
+    GFListener::GYRO_DATA_RATE getGyroDataRate();
+    GFListener::MAG_DATA_RATE getMagneticDataRate();
 
-    gfListener::QUAT_DATA_RATE getQuatDataRate();
+    GFListener::QUAT_DATA_RATE getQuatDataRate();
 
 private slots:
     void on_radioButton_12bit_clicked();
@@ -33,6 +33,14 @@ private slots:
     void on_radioButton_650Hz_clicked();
 
     void on_radioButton_1000Hz_clicked();
+
+    void on_groupBox_Quaternion_toggled(bool arg1);
+
+    void on_groupBox_Accel_toggled(bool arg1);
+
+    void on_groupBox_Gyro_toggled(bool arg1);
+
+    void on_groupBox_Magnetic_toggled(bool arg1);
 
 private:
     Ui::DialogDataSetting *ui;
