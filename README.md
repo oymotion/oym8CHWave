@@ -5,6 +5,7 @@ Captures EMG signals from gForcePro and play sound according to channel signals.
 ## oym8CHWave
 
 Displays waveforms according to EMG data from gForcePro. Sends sound on/off bit flags to oym8CHWaveArduino if oym8CHWaveArduino is connected.
+Developed using **Qt5.15.2** and **MSVC2019-64bit**.
 
 ## oym8CHWaveArduino
 
