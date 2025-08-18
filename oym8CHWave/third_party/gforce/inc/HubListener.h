@@ -59,19 +59,19 @@ namespace gf
 		/// \remark
 		///     This callback may be called after a series of onDeviceFound()
 		///     are called.
-		virtual void onScanFinished() {}
+        virtual void onScanFinished() = 0;
 
 		/// \brief This callback is called when the state of the hub changed
 		/// \param state
 		///     An enumerated value of HubState which indicates the state of the
         ///     hub.
-		virtual void onStateChanged(HubState state) {}
+        virtual void onStateChanged(HubState state) = 0;
 
 		/// \brief
         ///     This callback is called when the hub finds a device during
         ///     scanning.
 		/// \param device The pointer to a Device object that was found.
-		virtual void onDeviceFound(SPDEVICE device) {}
+        virtual void onDeviceFound(SPDEVICE device) = 0;
 
 		/// \brief
         ///     This callback is called when a previously found but not
@@ -79,14 +79,14 @@ namespace gf
 		/// \param device
         ///     The pointer to the Device object that was previously found and
 		///     passed to the application.
-		virtual void onDeviceDiscard(SPDEVICE device) {}
+        virtual void onDeviceDiscard(SPDEVICE device) = 0;
 
 		/// \brief
         ///     This callback is called when a device has been connected to
         ///     the hub successfully.
 		/// \param device
         ///     The pointer to the Device object that the hub has connected to.
-		virtual void onDeviceConnected(SPDEVICE device) {}
+        virtual void onDeviceConnected(SPDEVICE device) = 0;
 
 		/// \brief
         ///     This callback is called when a device has been disconnected from
@@ -94,7 +94,7 @@ namespace gf
 		/// \param device
         ///     The pointer to the Device object that was disconnected.
 		/// \param reason The reason of why device disconnected.
-		virtual void onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason) {}
+        virtual void onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason) = 0;
 
 		/// \brief
         ///     This callback is called when the orientation of the device has
@@ -104,12 +104,12 @@ namespace gf
 		/// \param orientation
         ///     The Quaternion object that indicates the updated orientation of
         ///     the device.
-		virtual void onOrientationData(SPDEVICE device, const Quaternion& orientation) {}
+        virtual void onOrientationData(SPDEVICE device, const Quaternion& orientation) = 0;
 
 		/// \brief This callback is called when the gesture data is recevied
 		/// \param device The Pointer to the Device.
 		/// \param gest The Gesture object.
-		virtual void onGestureData(SPDEVICE device, Gesture gest) {}
+        virtual void onGestureData(SPDEVICE device, Gesture gest) = 0;
 
 		/// \brief
         ///     This callback is called when the device status has been changed
@@ -123,14 +123,14 @@ namespace gf
         ///     quaternion). Please also see <a href="https://support.google.com/daydream/answer/7184599?hl=en">Google Daydram - Re-center your view & cursor</a>
 		///     DeviceStatus::Motionless: Notify that the device doesn't detect user motion
 		///     in long time, so it will turn to standby mode.
-		virtual void onDeviceStatusChanged(SPDEVICE device, DeviceStatus status) {}
+        virtual void onDeviceStatusChanged(SPDEVICE device, DeviceStatus status) = 0;
 
 		/// \brief This callback is called when the extended data is recevied
 		/// \param device The Pointer to the Device.
 		/// \param dataType The data type carried
 		/// \param data The data buffer managed by reference
-		virtual void onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, gfsPtr<const std::vector<GF_UINT8>> data) {}
+        virtual void onExtendedDeviceData(SPDEVICE device, DeviceDataType dataType, gfsPtr<const std::vector<GF_UINT8>> data) = 0;
 
-		virtual ~HubListener() {}
+        virtual ~HubListener() {}
 	};
 }

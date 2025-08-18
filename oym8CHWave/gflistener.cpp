@@ -75,6 +75,12 @@ void GFListener::onDeviceFound(SPDEVICE device)
     emit deviceFound(fullDevName(device), device->getRssi());
 }
 
+/// This callback is called when a previously found but not connected device has
+/// been dropped by the Hub.
+void GFListener::onDeviceDiscard(SPDEVICE device) {
+    cout << __FUNCTION__ << " has been called." << endl;
+}
+
 /// This callback is called a device has been connected successfully
 void GFListener::onDeviceConnected(SPDEVICE device)
 {
@@ -626,7 +632,7 @@ void GFListener::saveCombinedData(QString fileName)
     if (!fileName.isEmpty())
     {
         isRecordingCombinedData = true;
-        timestampOffset = QDateTime::currentMSecsSinceEpoch();
+        timestampOffset = 0; //QDateTime::currentMSecsSinceEpoch();
         g_combinedFile.open(fileName.toStdString());
 
         if (g_combinedFile.is_open())

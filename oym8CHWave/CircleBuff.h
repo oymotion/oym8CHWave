@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-//#include <algorithm>
+#include <algorithm>
 //#include <limits> 
 
 /*
@@ -216,8 +216,8 @@ class CIRCLE_BUFFER
 			if (_buff == NULL)
 				return false;
 
-			_min = min(_min, value);
-			_max = max(_max, value);
+            _min = std::min(_min, value);
+            _max = std::max(_max, value);
 
 			// remove first value from total, then add new value and calculate mean
 			_total -= (long double)_buff[_writeIndex & _buffSizeMask];		// remove last value from total
@@ -323,6 +323,7 @@ class CIRCLE_BUFFER
           return -32768;
           
         case 4:
+        default:
           return -2147483648;
         }
       }
@@ -341,13 +342,14 @@ class CIRCLE_BUFFER
         switch (sizeof(buff_type))
         {
         case 1:
-          return 127;
+          return (buff_type)127;
 
         case 2:
-          return 32767;
+          return (buff_type)32767;
           
         case 4:
-          return 2147483647;
+        default:
+          return (buff_type)2147483647;
         }
       }
       else
@@ -356,21 +358,22 @@ class CIRCLE_BUFFER
         switch (sizeof(buff_type))
         {
         case 1:
-          return 255;
+          return (buff_type)255;
 
         case 2:
-          return 65535;
+          return (buff_type)65535;
           
         case 4:
-          return 4294967295;
+        default:
+          return (buff_type)4294967295;
         }
       }
     }
 		
-		bool isPowerOfTwo(uint16_t x)			/**< return true if 'x' is a power of 2 */		
-		{
-			return (((uint16_t)x & ((uint16_t)x - (uint16_t)1)) == (uint16_t)0);
-		}
+    bool isPowerOfTwo(uint16_t x)			/**< return true if 'x' is a power of 2 */
+    {
+      return (((uint16_t)x & ((uint16_t)x - (uint16_t)1)) == (uint16_t)0);
+    }
 };
 
 

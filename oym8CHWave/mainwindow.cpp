@@ -35,10 +35,6 @@
 #include <QtGlobal>
 #include <qdebug.h>
 #include <iostream>
-#include <thread>
-#include <atomic>
-#include <functional>
-#include <future>
 #include <memory>
 #include <qdebug.h>
 
@@ -47,9 +43,10 @@
 #include "dialogdevice.h"
 
 
-QT_USE_NAMESPACE
-
 #define ARR_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
+
+QT_USE_NAMESPACE
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
@@ -112,6 +109,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
   retCode = mHub->registerListener(gflistener);
   cout << "registerListener " << ((retCode == GF_RET_CODE::GF_SUCCESS) ? "SUCCESS" : "FAIL") << endl;
+
+  setWindowTitle(tr("gForce Data Plot"));
 }
 
 
@@ -297,7 +296,7 @@ void MainWindow::on_actionConnectTogForce_triggered()
 {
     if (!hubReady)
     {
-        QMessageBox::question(this, tr("gForce Hub not ready"), tr("Did you plug in gForce dongle?"), QMessageBox::Ok);
+        QMessageBox::question(this, tr("gForce Hub not ready"), tr("Did you plug in gForce dongle?"));
         return;
     }
 
@@ -385,7 +384,7 @@ void MainWindow::on_pushButtonRecord_clicked()
         {
             // Save to raw EMG file
 
-            recordingEMGFileName = (QString("data") + QDir::separator() + QString("EMG_%1_%2bits_%3Hz.bin")).arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"), gflistener->getEMGDataBits(), gflistener->getEMGDataRate());
+            recordingEMGFileName = QString("data") + QDir::separator() + QString("EMG_%1_%2bits_%3Hz.bin").arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss").arg((int)gflistener->getEMGDataBits()).arg((int)gflistener->getEMGDataRate()));
             gflistener->saveEMGRawData(recordingEMGFileName);
         }
 

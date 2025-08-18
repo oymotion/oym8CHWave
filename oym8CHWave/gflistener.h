@@ -37,6 +37,7 @@ public:
     virtual void onScanFinished();
     virtual void onStateChanged(HubState state);
     virtual void onDeviceFound(SPDEVICE device);
+    virtual void onDeviceDiscard(SPDEVICE device);
     virtual void onDeviceConnected(SPDEVICE device);
     virtual void onDeviceDisconnected(SPDEVICE device, GF_UINT8 reason);
     virtual void onOrientationData(SPDEVICE device, const Quaternion& rotation);
