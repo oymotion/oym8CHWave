@@ -8,14 +8,28 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
   qRegisterMetaType<QVector<uint8_t>>("QVector<uint8_t>");
 
-  // Create transaltor
-  QTranslator trans;
+  QVector<QTranslator *> translators;
+  QString language = QLocale::system().name();
+  QString transDir = QCoreApplication::applicationDirPath() + "/translations/";
+  QDir directory(transDir);
 
-  // Load language pack
-  if (trans.load(QLocale::system().name() + ".qm"))
-  {
-    // install translator
-    a.installTranslator(&trans);
+  QStringList filters;
+  filters << "*" + language + ".qm";
+
+  auto files = directory.entryList(filters, QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
+
+  for (const QString &transFile : files) {
+      qDebug() << "language:" << language << ", translation:" << transDir + transFile;
+
+      QTranslator *translator = new QTranslator(&a);
+
+      if (translator->load(transDir + transFile)) {
+          a.installTranslator(translator);
+          translators.append(translator);
+      } else {
+          qWarning() << "Failed to load translation:" << transFile;
+          delete translator;
+      }
   }
 
   MainWindow mainwindow;
