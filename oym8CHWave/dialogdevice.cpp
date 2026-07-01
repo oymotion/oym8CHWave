@@ -118,6 +118,6 @@ void DialogDevice::on_pushButtonScan_clicked()
     ui->pushButtonScan->setEnabled(false);
     ui->listWidgetDevices->clear();
 
-    scanTurnsLeft = 5;
+    scanTurnsLeft = 20;
     hub->startScan(0);
 }
